@@ -2,7 +2,7 @@
   "required": true,
   "minVersion":  "0.4.10",
   "package": "com.blazeloader.event.mixin.client",
-  "refmap":  "mixins.blazeloader.client.refmap.json",
+  "refmap":  "mixins.blazeloader.refmap.json",
   "mixins": [
     "MClientBrandRetriever","MMinecraft","MGuiContainerCreative",
     "MEntityPlayerSP",

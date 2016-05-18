@@ -26,7 +26,7 @@ public abstract class MWorldServer {
 		index = 1,
 		at = @At(
 			value = "INVOKE",
-			target = "setBlockState(Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)Z"
+			target = "Lnet/minecraft/world/WorldServer;setBlockState(Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)Z"
 		)
 	)
 	private IBlockState internalSetBlockState(BlockPos pos, IBlockState state) {
