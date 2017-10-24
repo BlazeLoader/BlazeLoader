@@ -14,18 +14,20 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.village.VillageCollection;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldSavedData;
 import net.minecraft.world.WorldServer;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.storage.WorldSavedData;
 
 import com.blazeloader.api.ApiServer;
 
 import com.blazeloader.api.block.IBlock;
 import com.blazeloader.api.block.UpdateType;
+import com.blazeloader.api.privileged.IWorld;
 import com.blazeloader.api.world.gen.IChunkGenerator;
 import com.blazeloader.api.world.gen.WorldSavedDataCollection;
 import com.blazeloader.bl.interop.ForgeWorldAccess;
 import com.blazeloader.bl.main.BLMain;
+import com.blazeloader.util.time.WorldClock;
 import com.blazeloader.util.version.Versions;
 
 /**
@@ -52,15 +54,16 @@ public class ApiWorld {
      * @return	The resulting {@code T} object associated with this world.
      */
 	public static <T extends WorldSavedData> T registerWorldData(WorldServer world, Class<T> dataClass, String identifier) {
-		T loaded = (T)world.getMapStorage().loadData(dataClass, identifier);
+		@SuppressWarnings("unchecked")
+		T loaded = (T)world.loadData(dataClass, identifier);
 
         if (loaded == null) {
             try {
 				loaded = dataClass.getConstructor(World.class).newInstance(world);
 			} catch (Throwable e) {
-				BLMain.LOGGER_MAIN.logError(dataClass + " does not implement a basic constructor with param World.class", e);
+				BLMain.LOGGER_FULL.error(dataClass + " does not implement a basic constructor with param World.class", e);
 			}
-            world.getMapStorage().setData(identifier, loaded);
+            world.setData(identifier, loaded);
         } else {
         	if (loaded instanceof WorldSavedDataCollection) {
         		((WorldSavedDataCollection)loaded).setWorldsForAll(world);
@@ -149,8 +152,7 @@ public class ApiWorld {
      * @return	Closest player of null
      */
     public static EntityPlayer getClosestPlayer(World w, BlockPos pos, double distance) {
-    		  //.getClosestPlayer
-    	return w.func_184137_a(pos.getX(), pos.getY(), pos.getZ(), distance, false);
+    	return w.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), distance, false);
     }
     
 	/**
@@ -160,7 +162,7 @@ public class ApiWorld {
 	 * @param creatureType	The type of creature to spawn
 	 * @param pos			The location
 	 */
-	public static BiomeGenBase.SpawnListEntry getSpawnListEntryForTypeAt(World w, EnumCreatureType creatureType, BlockPos pos) {
+	public static Biome.SpawnListEntry getSpawnListEntryForTypeAt(World w, EnumCreatureType creatureType, BlockPos pos) {
 		if (w instanceof WorldServer) {
 			return ((WorldServer)w).getSpawnListEntryForTypeAt(creatureType, pos);
 		}
@@ -186,7 +188,7 @@ public class ApiWorld {
 	 * @param pos				The location we would like to spawn at
 	 * @return	True if we can spawn here
 	 */
-	public static boolean canSpawnHere(World w, EnumCreatureType creatureType, BiomeGenBase.SpawnListEntry spawnListEntry, BlockPos pos) {
+	public static boolean canSpawnHere(World w, EnumCreatureType creatureType, Biome.SpawnListEntry spawnListEntry, BlockPos pos) {
 		if (w instanceof WorldServer) {
 			return ((WorldServer)w).canCreatureTypeSpawnHere(creatureType, spawnListEntry, pos);
 		}
@@ -314,7 +316,7 @@ public class ApiWorld {
 	 * @param volume	Volume
 	 */
 	public static void playAuxSFX(World w, AuxilaryEffects soundType, BlockPos pos, int volume) {
-		w.playAuxSFX(soundType.getId(), pos, volume);
+		w.playEvent(soundType.getId(), pos, volume);
 	}
 	
 	/**
@@ -327,7 +329,7 @@ public class ApiWorld {
 	 * @param volume	Volume
 	 */
 	public static void playAuxSFX(World w, EntityPlayer player, AuxilaryEffects soundType, BlockPos pos, int volume) {
-		w.playAuxSFXAtEntity(player, soundType.getId(), pos, volume);
+		w.playEvent(player, soundType.getId(), pos, volume);
 	}
     
     /**
@@ -351,15 +353,15 @@ public class ApiWorld {
     public static WorldServer getServerWorldForDimension(int dimension) {
     	WorldServer[] worldServers = null;
     	try {
-    		worldServers = ApiServer.getServer().worldServers;
+    		worldServers = ApiServer.getServer().worlds;
     	} catch (Throwable e) {
-    		BLMain.LOGGER_FULL.logError("Exception in fetching worldservers for side SERVER. Please submit a bug report to Blazeloader devs.", e);
+    		BLMain.LOGGER_FULL.error("Exception in fetching worldservers for side SERVER. Please submit a bug report to Blazeloader devs.", e);
     	}
     	if (worldServers != null) {
     		dimension = getDimensionIndex(dimension);
     		if (dimension < 0 && dimension >= worldServers.length) {
     			dimension = 0;
-    			BLMain.LOGGER_FULL.logWarning("Unsupported dimension index. Make sure you pass in the index of the dimension you want, not the dimension code.");
+    			BLMain.LOGGER_FULL.warn("Unsupported dimension index. Make sure you pass in the index of the dimension you want, not the dimension code.");
     		}
     		return worldServers[dimension];
     	}
@@ -403,7 +405,7 @@ public class ApiWorld {
      * @return True if the side is solid or the default
      */
     public static boolean isSideSolid(World w, BlockPos pos, EnumFacing side, boolean def) {
-    	if (w.isValid(pos)) {
+    	if (((IWorld)w).isCoordValid(pos)) {
 			IBlockState state = w.getBlockState(pos);
 	        Block block = state.getBlock();
 	        if (Versions.isForgeInstalled()) {
@@ -439,5 +441,16 @@ public class ApiWorld {
     public static EnumFacing getBlockRotation(World w, BlockPos pos) {
     	IBlockState state = w.getBlockState(pos);
     	return ((IBlock)state.getBlock()).getBlockRotation(w, pos, state);
+    }
+    
+    /**
+     * Gets a clock representing the given world's current time.
+     * Repeated calls with the same world will return the same clock. Said clock will also maintain correct values.
+     * 
+     * @param w			The world
+     * @return WorldClock corresponding to the given world
+     */
+    public static WorldClock getWorldClock(World w) {
+    	return ((IWorld)w).getWorldClock();
     }
 }

@@ -2,6 +2,8 @@ package com.blazeloader.api.item;
 
 import java.lang.reflect.Field;
 
+import com.blazeloader.api.block.ApiBlock;
+import com.blazeloader.event.mixin.common.MItemBlock;
 import com.google.common.collect.Lists;
 import com.mumfrey.liteloader.client.ducks.IMutableRegistry;
 import net.minecraft.block.Block;
@@ -9,6 +11,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.RegistryNamespaced;
 
 /**
  * Api functions for items.
@@ -32,7 +35,8 @@ public class ApiItem {
      *
      * @return the item for simplicity
      */
-    public static <T extends Item> T quickRegisterItem(int id, String mod, String name, T item) {
+    @SuppressWarnings("unchecked")
+	public static <T extends Item> T quickRegisterItem(int id, String mod, String name, T item) {
         return registerItem(id, new ResourceLocation(mod, name), (T)item.setUnlocalizedName(mod + "." + name));
     }
 	
@@ -58,11 +62,12 @@ public class ApiItem {
      *
      * @return the item for simplicity
      */
-    public static <T extends Item> T registerItem(int id, ResourceLocation name, T item) {
-    	boolean exists = Item.itemRegistry.containsKey(name);
+    @SuppressWarnings("unchecked")
+	public static <T extends Item> T registerItem(int id, ResourceLocation name, T item) {
+    	boolean exists = getItemRegistry().containsKey(name);
     	if (exists) {
-    		Item existing = Item.itemRegistry.getObject(name);
-    		((IMutableRegistry<ResourceLocation, Item>)Item.itemRegistry).removeObjectFromRegistry(name);
+    		Item existing = getItemRegistry().getObject(name);
+    		((IMutableRegistry<ResourceLocation, Item>)getItemRegistry()).removeObjectFromRegistry(name);
     		try {
 	    		for (Field field : Items.class.getDeclaredFields()) {
 	                if (field.get(null).equals(existing)) {
@@ -71,7 +76,7 @@ public class ApiItem {
 	            }
     		} catch (Exception e) {}
     	}
-    	Item.itemRegistry.register(id, name, item);
+    	getItemRegistry().register(id, name, item);
         return item;
     }
     
@@ -95,7 +100,7 @@ public class ApiItem {
      * @return the item for simplicity
      */
     public static <T extends ItemBlock> T registerItemBlock(Block block, T item) {
-        return registerItemBlock(Block.getIdFromBlock(block), (ResourceLocation) Block.blockRegistry.getNameForObject(block), block, item);
+        return registerItemBlock(Block.getIdFromBlock(block), (ResourceLocation) ApiBlock.getBlockRegistry().getNameForObject(block), block, item);
     }
     
     /**
@@ -109,7 +114,7 @@ public class ApiItem {
      */
     public static <T extends ItemBlock> T registerItemBlock(int id, ResourceLocation name, Block block, T item) {
         registerItem(id, name, item);
-        Item.BLOCK_TO_ITEM.put(block, item);
+        ((MItemBlock)(Object)item).getBlockItemMap().put(block, item);
         return item;
     }
     
@@ -186,7 +191,7 @@ public class ApiItem {
      * @return Return a string of the name belonging to param item
      */
     public static ResourceLocation getItemName(Item item) {
-        return (ResourceLocation)Item.itemRegistry.getNameForObject(item);
+        return (ResourceLocation)getItemRegistry().getNameForObject(item);
     }
     
     /**
@@ -197,5 +202,9 @@ public class ApiItem {
      */
     public static String getStringItemName(Item item) {
         return getItemName(item).toString();
+    }
+    
+    public static RegistryNamespaced<ResourceLocation, Item> getItemRegistry() {
+    	return Item.REGISTRY;
     }
 }

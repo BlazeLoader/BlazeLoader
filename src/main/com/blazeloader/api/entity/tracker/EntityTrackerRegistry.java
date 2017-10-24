@@ -13,28 +13,29 @@ import net.minecraft.network.Packet;
 public class EntityTrackerRegistry {
 	private static EntityTrackerRegistry instance = new EntityTrackerRegistry();
 	
-	private HashMap<Class<? extends Entity>, ITrack> mappings = new HashMap<Class<? extends Entity>, ITrack>();
+	private final HashMap<Class<? extends Entity>, ITrack<Entity>> mappings = new HashMap<Class<? extends Entity>, ITrack<Entity>>();
 	
 	public static EntityTrackerRegistry instance() {
 		return instance;
 	}
 	
-	public void addTracker(Class entityClass, int range, int updateFrequency, boolean includeVelocity) {
-		addTracker(entityClass, new BasicTrack(range, updateFrequency, includeVelocity));
+	public <T extends Entity> void addTracker(Class<T> entityClass, int range, int updateFrequency, boolean includeVelocity) {
+		addTracker(entityClass, new BasicTrack<T>(range, updateFrequency, includeVelocity));
 	}
 	
-	public void addTracker(Class entityClass, ITrack tracker) {
-		mappings.put(entityClass, tracker);
+	@SuppressWarnings("unchecked")
+	public <T extends Entity> void addTracker(Class<T> entityClass, ITrack<T> tracker) {
+		mappings.put(entityClass, (ITrack<Entity>)tracker);
 	}
 	
 	public boolean addEntityToTracker(EntityTracker tracker, Entity entity) {
 		if (entity != null) {
 			if (entity instanceof ITrackable) {
 				ITrackable trackable = (ITrackable)entity;
-				tracker.addEntityToTracker(entity, trackable.getMaxRange(), trackable.getUpdateFrequency(), trackable.mustSendVelocity());
+				tracker.track(entity, trackable.getMaxRange(), trackable.getUpdateFrequency(), trackable.mustSendVelocity());
 				return true;
 			} else {
-				ITrack entry = mappings.get(entity.getClass());
+				ITrack<Entity> entry = mappings.get(entity.getClass());
 				if (entry != null) {
 					entry.addEntityToTracker(tracker, entity);
 					return true;
@@ -44,13 +45,13 @@ public class EntityTrackerRegistry {
 		return false;
 	}
 	
-	public Packet getSpawnPacket(EntityTrackerEntry trackerEntry) {
+	public Packet<?> getSpawnPacket(EntityTrackerEntry trackerEntry) {
 		if (trackerEntry != null) {
 			Entity tracked = trackerEntry.getTrackedEntity();
 			if (tracked instanceof ITrackable) {
 				return BLPacketChannels.instance().getRawPacket(new BLPacketSpawnObject.Message(tracked, 1));
 			}
-			ITrack entry = mappings.get(tracked.getClass());
+			ITrack<Entity> entry = mappings.get(tracked.getClass());
 			if (entry != null) {
 				return entry.getEntitySpawnPacket(trackerEntry);
 			}

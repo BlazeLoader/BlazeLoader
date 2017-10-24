@@ -72,6 +72,6 @@ public class Var<T, V> extends Variable<T, V> {
 		if (handle.staticField) {
 			return this;
 		}
-		return new BufferedVar<T, V>(instance, this);
+		return new BoundVar<T, V>(instance, this);
 	}
 }

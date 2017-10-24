@@ -62,9 +62,9 @@ public class Rect implements IShape {
 	}
 	
 	public Vec3d computePoint(Random rand) {
-		double x = MathHelper.getRandomDoubleInRange(rand, 0, width);
-		double y = MathHelper.getRandomDoubleInRange(rand, 0, depth);
-		double z = MathHelper.getRandomDoubleInRange(rand, 0, height);
+		double x = MathHelper.nextDouble(rand, 0, width);
+		double y = MathHelper.nextDouble(rand, 0, depth);
+		double z = MathHelper.nextDouble(rand, 0, height);
 		return (new Vec3d(x, y, z)).rotateYaw(yaw).rotatePitch(pitch);
 	}
 	
@@ -76,9 +76,9 @@ public class Rect implements IShape {
 	
 	public boolean isPointInside(Vec3d point) {
 		point = point.rotateYaw(-yaw).rotatePitch(-pitch);
-		double x = Math.abs(point.xCoord);
-		double y = Math.abs(point.yCoord);
-		double z = Math.abs(point.zCoord);
+		double x = Math.abs(point.x);
+		double y = Math.abs(point.y);
+		double z = Math.abs(point.z);
 		if (hollow) return x == width/2 && y == height/2 && z == depth/2;
 		return x <= width/2 && y <= height/2 && z <= depth/2;
 	}

@@ -9,8 +9,8 @@ import com.blazeloader.event.handlers.EventHandler;
 import com.blazeloader.event.handlers.InternalEventHandler;
 
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.IChunkGenerator;
 
 @Mixin(Chunk.class)
 public abstract class MChunk {
@@ -24,7 +24,7 @@ public abstract class MChunk {
 		EventHandler.eventOnChunkUnload((Chunk)(Object)this);
 	}
 	
-	@Inject(method = "populateChunk(Lnet/minecraft/world/chunk/IChunkProvider;Lnet/minecraft/world/chunk/IChunkGenerator;)V", at = @At("RETURN"))
+	@Inject(method = "populateChunk(Lnet/minecraft/world/chunk/IChunkProvider;Lnet/minecraft/world/gen/IChunkGenerator;)V", at = @At("RETURN"))
 	private void onPopulateChunk(IChunkProvider one, IChunkGenerator two, CallbackInfo info) {
 		InternalEventHandler.eventPopulateChunk((Chunk)(Object)this, one, two);
 	}

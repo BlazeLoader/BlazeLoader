@@ -4,7 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
 /**
- * Interface for entities that want to return a custom item when a player uses PickBlock on this entity.
+ * Interface for entities that want to return a custom item when a player uses the PickBlock key on them.
  * 
  * e.g Boats give boats, and mobs give spawn eggs
  */
@@ -15,5 +15,5 @@ public interface IMousePickHandler {
 	 * 
 	 * @return the item that must be picked or null for default behaviour.
 	 */
-	public ItemStack onPlayerMiddleClick(EntityPlayer player);
+	ItemStack onPlayerMiddleClick(EntityPlayer player);
 }

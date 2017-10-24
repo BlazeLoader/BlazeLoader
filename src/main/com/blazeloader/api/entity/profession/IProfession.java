@@ -22,35 +22,35 @@ public interface IProfession {
 	 * 
 	 * @return	True if it may mate, false otherwise
 	 */
-	public boolean checkMatingConditions(ItemStack stack, int stackMultiplier);
+	boolean checkMatingConditions(ItemStack stack, int stackMultiplier);
 	
-	public int getStackMultiplier();
+	int getStackMultiplier();
 	
-	public int getNewCareer(Random rand);
+	int getNewCareer(Random rand);
 	
 	/**
 	 * Gets the entries for a villager's trades.
 	 * 
 	 * @param villager	The villager
 	 */
-	public ITradeList[] getTradeList(int careerId, int careerLevel);
+	ITradeList[] getTradeList(int careerId, int careerLevel);
 	
 	/**
 	 * Gets a display name for the villager.
 	 */
-	public ITextComponent getDisplayName();
+	ITextComponent getDisplayName();
 	
 	/**
 	 * Gets a villager texture location for this profession.
 	 * 
 	 * @param villager	The villager
 	 */
-	public ResourceLocation getResourceLocation();
+	ResourceLocation getResourceLocation();
 	
 	/**
 	 * Sets profession specific AI tasks for the given villager.
 	 * 
 	 * @param aiTasks the villager's set of AI tasks.
 	 */
-	public void setAdditionalAItasks(EntityAITasks aiTasks);
+	void setAdditionalAItasks(EntityAITasks aiTasks);
 }

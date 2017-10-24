@@ -3,8 +3,8 @@ package com.blazeloader.api.recipe;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.util.ResourceLocation;
 
 /**
  * API function related to vanilla crafting
@@ -17,8 +17,8 @@ public class ApiRecipe {
      * @param output An itemStack with the recipe output
      * @param args   An object array on how to form the recipe e.g. "##", "##", "##", Character.valueOf('#'), new ItemStack(Block.door)
      */
-    public static void addShapedCraftingRecipe(ItemStack output, Object... args) {
-        CraftingManager.getInstance().addRecipe(output, args);
+    public static void addShapedCraftingRecipe(ResourceLocation name, ItemStack output, Object... input) {
+    	ApiCrafting.getVanillaCraftingManager().addRecipe(name, output, input);
     }
 
     /**
@@ -27,8 +27,8 @@ public class ApiRecipe {
      * @param output An itemStack with the recipe output
      * @param args   An object array of itemStacks to use
      */
-    public static void addShapelessCraftingRecipe(ItemStack output, Object... args) {
-        CraftingManager.getInstance().addShapelessRecipe(output, args);
+    public static void addShapelessCraftingRecipe(ResourceLocation name, ItemStack output, Object... input) {
+    	ApiCrafting.getVanillaCraftingManager().addShapelessRecipe(name, output, input);
     }
 
     /**

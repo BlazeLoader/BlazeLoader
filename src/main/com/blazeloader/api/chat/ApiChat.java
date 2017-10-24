@@ -22,7 +22,7 @@ public class ApiChat {
      * @param message 	The message to send.
      */
     public static void sendRawChat(ICommandSender user, String message) {
-        user.addChatMessage(new TextComponentString(message));
+        user.sendMessage(new TextComponentString(message));
     }
     
     /**
@@ -77,13 +77,13 @@ public class ApiChat {
 				}
 			} else if (o instanceof ClickEvent) {
 				if (style == null) style = new Style();
-				style.setChatClickEvent((ClickEvent)o);
+				style.setClickEvent((ClickEvent)o);
 			} else if (o instanceof HoverEvent) {
 				if (style == null) style = new Style();
-				style.setChatHoverEvent((HoverEvent)o);
+				style.setHoverEvent((HoverEvent)o);
 			} else if (o instanceof ITextComponent) {
 				if (style != null) {
-					((ITextComponent)o).setChatStyle(style);
+					((ITextComponent)o).setStyle(style);
 					style = null;
 				}
 				message.appendSibling((ITextComponent)o);
@@ -97,14 +97,14 @@ public class ApiChat {
 			} else {
 				ITextComponent line = o instanceof String ? new TextComponentTranslation((String)o) : new TextComponentString(o.toString());
 				if (style != null) {
-					line.setChatStyle(style);
+					line.setStyle(style);
 					style = null;
 				}
 				message.appendSibling(line);
 			}
 		}
 		
-		user.addChatMessage(message);
+		user.sendMessage(message);
 	}
     
     /**
@@ -134,11 +134,11 @@ public class ApiChat {
         if ((temp = child.getColor()) != null) {
         	parent.setColor((TextFormatting)temp);
         }
-        if ((temp = child.getChatClickEvent()) != null) {
-        	parent.setChatClickEvent((ClickEvent)temp);
+        if ((temp = child.getClickEvent()) != null) {
+        	parent.setClickEvent((ClickEvent)temp);
         }
-        if ((temp = child.getChatHoverEvent()) != null) {
-        	parent.setChatHoverEvent((HoverEvent)temp);
+        if ((temp = child.getHoverEvent()) != null) {
+        	parent.setHoverEvent((HoverEvent)temp);
         }
         if ((temp = child.getInsertion()) != null) {
         	parent.setInsertion((String)temp);

@@ -6,7 +6,9 @@ import java.util.Map;
 
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.CommandHelp;
+import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.server.MinecraftServer;
 
 public class CommandPrivateHelp extends CommandHelp {
 	
@@ -17,13 +19,15 @@ public class CommandPrivateHelp extends CommandHelp {
 		handler = commands;
 	}
 	
-    protected List getSortedPossibleCommands(ICommandSender par1ICommandSender) {
-        List var2 = handler.getPossibleCommands(par1ICommandSender);
+	@Override
+	protected List<ICommand> getSortedPossibleCommands(ICommandSender sender, MinecraftServer server) {
+        List<ICommand> var2 = handler.getPossibleCommands(sender);
         Collections.sort(var2);
         return var2;
     }
-
-    protected Map getCommands() {
+	
+	@Override
+	protected Map<String, ICommand> getCommandMap(MinecraftServer server) {
         return handler.getCommands();
     }
 }

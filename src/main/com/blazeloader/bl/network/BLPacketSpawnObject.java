@@ -2,6 +2,7 @@ package com.blazeloader.bl.network;
 
 import java.io.IOException;
 
+import com.blazeloader.api.entity.ApiEntity;
 import com.blazeloader.api.entity.ApiProjectile;
 import com.blazeloader.api.network.IMessage;
 import com.blazeloader.api.network.IMessageHandler;
@@ -24,12 +25,12 @@ public class BLPacketSpawnObject implements IMessageHandler<BLPacketSpawnObject.
 		double x = (double)message.wrapped.getX() / 32.0D;
         double y = (double)message.wrapped.getY() / 32.0D;
         double z = (double)message.wrapped.getZ() / 32.0D;
-        World world = Minecraft.getMinecraft().theWorld;
+        World world = Minecraft.getMinecraft().world;
         Entity entity = EntityList.createEntityByID(message.wrapped.getType(), world);
         
         if (entity != null) {
         	entity.setPosition(x, y, z);
-        	EntityTracker.func_187254_a(entity, message.wrapped.getX(), message.wrapped.getY(), message.wrapped.getZ());
+        	EntityTracker.updateServerPosition(entity, message.wrapped.getX(), message.wrapped.getY(), message.wrapped.getZ());
             entity.rotationPitch = (float)(message.wrapped.getPitch() * 360) / 256f;
             entity.rotationYaw = (float)(message.wrapped.getYaw() * 360) / 256f;
             Entity[] parts = entity.getParts();
@@ -68,7 +69,7 @@ public class BLPacketSpawnObject implements IMessageHandler<BLPacketSpawnObject.
 		}
 		
 		public Message(Entity e, int unknown) {
-			wrapped = new SPacketSpawnObject(e, EntityList.getEntityID(e));
+			wrapped = new SPacketSpawnObject(e, ApiEntity.getEntityID(e));
 		}
 		
 		public void fromBytes(ByteBuf buf) {

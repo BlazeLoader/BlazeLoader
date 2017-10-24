@@ -60,18 +60,18 @@ public class HemiSphere extends Sphere {
 	public Vec3d computePoint(Random rand) {
 		Vec3d result = super.computePoint(rand);
 		if (quadrants.length > 0 && quadrants[0] != null) {
-			if ((quadrants[0] && result.xCoord < 0) || (!quadrants[0] && result.xCoord > 0)) {
-				result = new Vec3d(-result.xCoord, result.yCoord, result.zCoord);
+			if ((quadrants[0] && result.x < 0) || (!quadrants[0] && result.x > 0)) {
+				result = new Vec3d(-result.x, result.y, result.z);
 			}
 		}
 		if (quadrants.length > 1 && quadrants[1] != null) {
-			if ((quadrants[1] && result.yCoord < 0) || (!quadrants[1] && result.yCoord > 0)) {
-				result = new Vec3d(result.xCoord, -result.yCoord, result.zCoord);
+			if ((quadrants[1] && result.y < 0) || (!quadrants[1] && result.y > 0)) {
+				result = new Vec3d(result.x, -result.y, result.z);
 			}
 		}
 		if (quadrants.length > 2 && quadrants[2] != null) {
-			if ((quadrants[2] && result.zCoord < 0) || (!quadrants[2] && result.zCoord > 0)) {
-				result = new Vec3d(result.xCoord, result.yCoord, -result.zCoord);
+			if ((quadrants[2] && result.z < 0) || (!quadrants[2] && result.z > 0)) {
+				result = new Vec3d(result.x, result.y, -result.z);
 			}
 		}
 		return result.rotateYaw(yaw).rotatePitch(pitch);
@@ -85,19 +85,19 @@ public class HemiSphere extends Sphere {
 	
 	public boolean isPointInside(Vec3d point) {
 		Vec3d untransformed = point.rotateYaw(-yaw).rotatePitch(-pitch);
-		untransformed = new Vec3d(point.xCoord / stretch.xCoord, point.yCoord / stretch.yCoord, point.zCoord / stretch.zCoord);
+		untransformed = new Vec3d(point.x / stretch.x, point.y / stretch.y, point.z / stretch.z);
 		if (quadrants.length > 0 && quadrants[0] != null) {
-			if ((quadrants[0] && untransformed.xCoord < 0) || (!quadrants[0] && untransformed.xCoord > 0)) {
+			if ((quadrants[0] && untransformed.x < 0) || (!quadrants[0] && untransformed.x > 0)) {
 				return false;
 			}
 		}
 		if (quadrants.length > 1 && quadrants[1] != null) {
-			if ((quadrants[1] && untransformed.yCoord < 0) || (!quadrants[1] && untransformed.yCoord > 0)) {
+			if ((quadrants[1] && untransformed.y < 0) || (!quadrants[1] && untransformed.y > 0)) {
 				return false;
 			}
 		}
 		if (quadrants.length > 2 && quadrants[2] != null) {
-			if ((quadrants[2] && untransformed.zCoord < 0) || (!quadrants[2] && untransformed.zCoord > 0)) {
+			if ((quadrants[2] && untransformed.z < 0) || (!quadrants[2] && untransformed.z > 0)) {
 				return false;
 			}
 		}

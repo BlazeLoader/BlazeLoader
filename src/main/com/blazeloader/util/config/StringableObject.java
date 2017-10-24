@@ -22,7 +22,7 @@ public class StringableObject<T> implements IWrapObject<T> {
 	public String toString() {
 		return object.toString();
 	}
-		
+	
 	public T get() {
 		return object;
 	}
@@ -31,14 +31,16 @@ public class StringableObject<T> implements IWrapObject<T> {
 		object = value;
 	}
 	
+	@SuppressWarnings({ "unchecked" })
 	public void fromString(T def, String value) {
 		if (def != null) {
+			@SuppressWarnings("rawtypes")
 			Class typeClass = def.getClass();
 			try {
 				if (typeClass.isEnum()) {
 					object = (T)Enum.valueOf(typeClass, value);
 				} else if (IStringable.class.isAssignableFrom(def.getClass())) {
-					object = (T)((IStringable)def).fromString(value);
+					object = (T)((IStringable<?>)def).fromString(value);
 				} else {
 					Method m = typeClass.getMethod("valueOf", String.class);
 					if (!m.isAccessible()) {
@@ -57,14 +59,16 @@ public class StringableObject<T> implements IWrapObject<T> {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static <T> T coaxType(T def, String value) {
 		if (def != null) {
+			@SuppressWarnings("rawtypes")
 			Class typeClass = def.getClass();
 			try {
 				if (typeClass.isEnum()) {
 					return (T)Enum.valueOf(typeClass, value);
 				} else if (IStringable.class.isAssignableFrom(def.getClass())) {
-					return (T)((IStringable)def).fromString(value);
+					return (T)((IStringable<?>)def).fromString(value);
 				} else {
 					Method m = typeClass.getMethod("valueOf", String.class);
 					if (!m.isAccessible()) {

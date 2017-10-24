@@ -1,1 +1,9 @@
->>blazeloader.at
+#uses .onf format
+:net.minecraft.creativetab
+	ahp:CreativeTabs
+#Allow new creative tab types
+		-f!a:78032_a:CREATIVE_TAB_ARRAY
+:net.minecraft.world
+	amz:WorldType
+#Make WorldType.worldTypes non-final
+		-f!a:77139_a:WORLD_TYPES

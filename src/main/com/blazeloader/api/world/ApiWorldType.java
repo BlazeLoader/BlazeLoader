@@ -1,9 +1,16 @@
 package com.blazeloader.api.world;
 
+import java.util.Arrays;
+
+import com.blazeloader.bl.main.BLMain;
+import com.blazeloader.event.mixin.common.MWorldType;
+import com.blazeloader.util.reflect.Constr;
+import com.blazeloader.util.reflect.Reflect;
+
 import net.minecraft.world.WorldType;
 
 public class ApiWorldType {
-	
+		
 	/**
 	 * Creates a new world type with the given name.
 	 * 
@@ -17,7 +24,7 @@ public class ApiWorldType {
 	 * @param name		The name of the world type.
 	 * @return	A brand new WorldType for use.
 	 */
-	public static ModWorldType registerWorldType(String modName, String name) {
+	public static IWorldType registerWorldType(String modName, String name) {
 		return registerWorldType(modName, name, 0);
 	}
 	
@@ -33,15 +40,22 @@ public class ApiWorldType {
 	 * @param version	The generator version (default 0)
 	 * @return	A brand new WorldType for use.
 	 */
-	public static ModWorldType registerWorldType(String modName, String name, int version) {
-		return new ModWorldType(modName, name, version);
+	private static final Constr<WorldType> worldTypeConstructor = Reflect.lookupConstructor(WorldType.class, int.class, String.class, int.class);
+	public static IWorldType registerWorldType(String modName, String name, int version) {
+		IWorldType result = null;
+		try {
+			result = ((IWorldType)worldTypeConstructor.call(getNextWorldTypeId(), name, version)).setModName(modName);
+		} catch (Throwable e) {
+			BLMain.LOGGER_FULL.fatal("Error constructing WorldType", e);
+		}
+		return result;
 	}
 	
 	/**
 	 * Gets the array of all known WorldTypes
 	 */
 	public static WorldType[] getWorldTypes() {
-		return WorldType.worldTypes;
+		return WorldType.WORLD_TYPES;
 	}
 	
 	/**
@@ -56,24 +70,11 @@ public class ApiWorldType {
 	 * Gets a world type for the given id or null if the given id is not valid.
 	 * @param id	The id of the world type
 	 */
-	public static WorldType getWorldType(int id) {
-		if (id < 0 || id > WorldType.worldTypes.length) {
+	public static IWorldType getWorldType(int id) {
+		if (id < 0 || id > getWorldTypes().length) {
 			return null;
 		}
-		return WorldType.worldTypes[id];
-	}
-	
-	/**
-	 * Gets the name of a world type.
-	 * If the world type is one registered by ApiWOrldType.registerWorldType will return the name without the mod prefix.
-	 * @param type	The world type
-	 * @return	A string name.
-	 */
-	public static String getWorldTypeName(WorldType type) {
-		if (type instanceof ModWorldType) {
-			return ((ModWorldType)type).getPlainName();
-		}
-		return type.getWorldTypeName();
+		return (IWorldType)getWorldTypes()[id];
 	}
 	
 	/**
@@ -82,12 +83,15 @@ public class ApiWorldType {
 	 * @return "vanilla" for non mod world types and "unknown" for unrecognised mods otherwise the mod name it was registered with.
 	 */
 	public static String getWorldTypeMod(WorldType type) {
-		if (type instanceof ModWorldType) {
-			return ((ModWorldType)type).getModName();
+		return ((IWorldType)type).getModName();
+	}
+	
+	private static int getNextWorldTypeId() {
+		WorldType[] types = getWorldTypes();
+		for (int i = 0; i < types.length; i++) {
+			if (types[i] == null) return i;
 		}
-		if (type.getClass() != WorldType.class) {
-			return "unknown";
-		}
-		return "vanilla";
+		MWorldType.setWorldTypes(Arrays.copyOf(types, types.length + 16));
+		return types.length;
 	}
 }

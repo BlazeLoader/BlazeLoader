@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandHandler;
 import net.minecraft.crash.CrashReport;
@@ -25,14 +26,15 @@ import net.minecraft.util.ReportedException;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 
 import com.blazeloader.api.ApiGeneral;
 import com.blazeloader.api.block.fluid.Fluid;
-import com.blazeloader.api.entity.properties.EntityPropertyManager;
+import com.blazeloader.api.block.fluid.FluidFlowing;
 import com.blazeloader.api.entity.tracker.EntityTrackerRegistry;
+import com.blazeloader.api.privileged.IWorld;
 import com.blazeloader.api.recipe.FurnaceFuels;
 import com.blazeloader.api.world.ApiWorld;
 import com.blazeloader.api.world.gen.IChunkGenerator;
@@ -60,18 +62,18 @@ public class InternalEventHandler {
 		return brand;
 	}
 
-	public static void eventPopulateChunk(Chunk sender, IChunkProvider providerOne, net.minecraft.world.chunk.IChunkGenerator providerTwo) {
+	public static void eventPopulateChunk(Chunk sender, IChunkProvider providerOne, net.minecraft.world.gen.IChunkGenerator providerTwo) {
 		if (UnpopulatedChunksQ.instance().pop(sender)) {
 			Random random = new Random(sender.getWorld().getSeed());
 			long seedX = random.nextLong() >> 2 + 1l;
 			long seedZ = random.nextLong() >> 2 + 1l;
-			long chunkSeed = (seedX * sender.xPosition + seedZ * sender.zPosition) ^ sender.getWorld().getSeed();
+			long chunkSeed = (seedX * sender.x + seedZ * sender.z) ^ sender.getWorld().getSeed();
 
 			List<IChunkGenerator> generators = ApiWorld.getGenerators();
 			for (IChunkGenerator i : generators) {
 				random.setSeed(chunkSeed);
 				try {
-					i.populateChunk(sender, providerOne, providerTwo, sender.xPosition, sender.zPosition, random);
+					i.populateChunk(sender, providerOne, providerTwo, sender.x, sender.z, random);
 				} catch (Throwable e) {
 					throw new ReportedException(CrashReport.makeCrashReport(e, "Exception during mod chunk populating"));
 				}
@@ -80,18 +82,11 @@ public class InternalEventHandler {
 	}
 	
 	public static void eventOnEntityRemoved(Entity entity) {
-		if (entity.isDead) {
-			if (!(entity instanceof EntityPlayer)) {
-				EntityPropertyManager.instance().entityDestroyed(entity);
-			}
-		}
+		
 	}
 	
     public static void eventClonePlayer(EntityPlayer sender, EntityPlayer old, boolean respawnedFromEnd) {
-    	EntityPropertyManager.instance().copyToEntity(old, sender);
-    	if (!old.getUniqueID().equals(sender.getUniqueID())) {
-    		EntityPropertyManager.instance().entityDestroyed(old);
-    	}
+    	
     }
     
     public static void eventTrackEntity(EntityTracker sender, CallbackInfo info, Entity entity) {
@@ -103,7 +98,7 @@ public class InternalEventHandler {
     }
     
     public static void eventGetSpawnPacket(EntityTrackerEntry sender, CallbackInfoReturnable<Packet<?>> info) {
-    	Packet result = EntityTrackerRegistry.instance().getSpawnPacket(sender);
+    	Packet<?> result = EntityTrackerRegistry.instance().getSpawnPacket(sender);
     	if (result != null) {
     		info.setReturnValue(result);
     	} else {
@@ -112,8 +107,8 @@ public class InternalEventHandler {
     }
     
     public static void eventCanBlockFreeze(World sender, BlockPos pos, boolean noWaterAdj, CallbackInfoReturnable<Boolean> info) {
-    	if (sender.isValid(pos.add(-pos.getX(), 0, -pos.getZ()))) {
-    		BiomeGenBase biomegenbase = sender.getBiomeGenForCoords(pos);
+    	if (((IWorld)sender).isCoordValid(pos.add(-pos.getX(), 0, -pos.getZ()))) {
+    		Biome biomegenbase = sender.getBiome(pos);
             if (biomegenbase.getFloatTemperature(pos) < 0.15f) {
             	IBlockState state = sender.getBlockState(pos);
             	Block block = state.getBlock();
@@ -137,15 +132,22 @@ public class InternalEventHandler {
     	}
     }
     
-    public static void eventGetFlowDirection(IBlockAccess w, BlockPos pos, CallbackInfoReturnable<Float> info) {
+    public static void eventPlaceStaticBlock(BlockDynamicLiquid sender, World w, BlockPos pos, IBlockState state, CallbackInfo info) {
+    	if (sender instanceof FluidFlowing) {
+    		((FluidFlowing)sender).stopFlowing(w, pos, state);
+    		info.cancel();
+    	}
+    }
+    
+    public static void eventGetFlowDirection(IBlockAccess w, BlockPos pos, IBlockState state, CallbackInfoReturnable<Float> info) {
     	Block block = w.getBlockState(pos).getBlock();
     	if (!(block instanceof Fluid)) return;
-    	Vec3d vec3 = ((Fluid)block).getFlowingBlock().getFlowVector(w, pos);
-        info.setReturnValue((float)(vec3.xCoord == 0 && vec3.zCoord == 0 ? -1000 : MathHelper.atan2(vec3.zCoord, vec3.xCoord) - (Math.PI / 2)));
+    	Vec3d vec3 = ((Fluid)block).getFlowingBlock().getFlow(w, pos, state);
+        info.setReturnValue((float)(vec3.x == 0 && vec3.z == 0 ? -1000 : MathHelper.atan2(vec3.z, vec3.x) - (Math.PI / 2)));
     }
     
     public static IBlockState getFluidFrozenState(World sender, BlockPos pos, IBlockState state) {
-    	if (state == Blocks.ice.getDefaultState()) {
+    	if (state == Blocks.ICE.getDefaultState()) {
 			Block block = sender.getBlockState(pos).getBlock();
 			if (block instanceof Fluid) {
 				return ((Fluid)block).getFrozenState();

@@ -15,30 +15,31 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 
 public class ModStateMap extends StateMapperBase {
 	private final String modid;
-    private final IProperty mappedProperty;
+    private final IProperty<?> mappedProperty;
     private final String suffix;
-    private final List<IProperty> ignoredProperties;
+    private final List<IProperty<?>> ignoredProperties;
     
-    private ModStateMap(String modid, IProperty mappedProperty, String suffix, List<IProperty> ignoredProperties) {
+    private ModStateMap(String modid, IProperty<?> mappedProperty, String suffix, List<IProperty<?>> ignoredProperties) {
     	this.modid = modid;
         this.mappedProperty = mappedProperty;
         this.suffix = suffix;
         this.ignoredProperties = ignoredProperties;
     }
 
-    protected ModelResourceLocation getModelResourceLocation(IBlockState state) {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	protected ModelResourceLocation getModelResourceLocation(IBlockState state) {
         LinkedHashMap<IProperty<?>, Comparable<?>> stateProperties = Maps.newLinkedHashMap(state.getProperties());
         String modelLocation;
 
         if (mappedProperty == null) {
             modelLocation = ApiBlock.getStringBlockName(state.getBlock());
         } else {
-            modelLocation = modid + ":" + mappedProperty.getName(stateProperties.remove(mappedProperty));
+            modelLocation = modid + ":" + ((IProperty)mappedProperty).getName(stateProperties.remove(mappedProperty));
         }
 
         if (suffix != null) modelLocation += suffix;
         
-        for (IProperty i : ignoredProperties) {
+        for (IProperty<?> i : ignoredProperties) {
             stateProperties.remove(i);
         }
 
@@ -49,15 +50,15 @@ public class ModStateMap extends StateMapperBase {
      * Builder class for creating a state mapper for block models.
      */
     public static class Builder {
-        private IProperty property;
+        private IProperty<?> property;
         private String suffix;
         private String modId = "minecraft";
-        private final List excludedProperties = Lists.newArrayList();
+        private final List<IProperty<?>> excludedProperties = Lists.newArrayList();
         
         /**
          * Sets the property used when mapping states to resource locations.
          */
-        public Builder setProperty(IProperty mappedProperty) {
+        public Builder setProperty(IProperty<?> mappedProperty) {
             property = mappedProperty;
             return this;
         }
@@ -81,7 +82,7 @@ public class ModStateMap extends StateMapperBase {
         /**
          * Adds properties that must be ignored when generating a resource location
          */
-        public Builder addPropertiesToIgnore(IProperty ... ignored) {
+        public Builder addPropertiesToIgnore(IProperty<?> ... ignored) {
             Collections.addAll(excludedProperties, ignored);
             return this;
         }

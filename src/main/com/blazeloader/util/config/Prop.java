@@ -8,7 +8,7 @@ import com.blazeloader.api.compatibility.IWatchable;
 public class Prop<T> implements IProperty<T>, IWatchable<T> {
 	private final IConfig cfg;
 	
-	private Class typeClass;
+	private Class<T> typeClass;
 	private IWrapObject<T> currentValue;
 	private IWrapObject<T> defaultValue;
 	
@@ -22,8 +22,8 @@ public class Prop<T> implements IProperty<T>, IWatchable<T> {
 	
 	protected Prop(IConfig config, List<String> lines) {
 		cfg = config;
-		defaultValue = new StringableObject(null);
-		currentValue = new StringableObject(null);
+		defaultValue = new StringableObject<T>(null);
+		currentValue = new StringableObject<T>(null);
 		checkForComment(lines);
 		String first = cfg.popNextValue(lines);
 		String def = null;
@@ -46,24 +46,25 @@ public class Prop<T> implements IProperty<T>, IWatchable<T> {
 			currentValue.set(unescapeValue(value));
 		}
 		if (defaultValue.get() != null) {
-			typeClass = defaultValue.get().getClass();
+			typeClass = defaultValue.getObjectClass();
 		} else {
-			typeClass = currentValue.get().getClass();
+			typeClass = currentValue.getObjectClass();
 		}
 		loaded = true;
 	}
 		
+	@SuppressWarnings("unchecked")
 	protected Prop(IConfig config, String name, T def) {
 		cfg = config;
-		typeClass = def.getClass();
+		typeClass = (Class<T>)def.getClass();
 		propertyName = cfg.applyNameRegexString(name);
 		
 		if (typeClass.isArray()) {
-			defaultValue = new StringableArray((T[])def); 
-			currentValue = new StringableArray((T[])defaultValue.get());
+			defaultValue = (IWrapObject<T>) new StringableArray<T>((T[])def); 
+			currentValue = (IWrapObject<T>) new StringableArray<T>((T[])defaultValue.get());
 		} else {
-			defaultValue = new StringableObject(def);
-			currentValue = new StringableObject(def);
+			defaultValue = new StringableObject<T>(def);
+			currentValue = new StringableObject<T>(def);
 		}
 	}
 	
@@ -101,6 +102,7 @@ public class Prop<T> implements IProperty<T>, IWatchable<T> {
 		return typeClass.getSimpleName();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public T[] getPossibleValues() {
 		if (defaultValue.get() instanceof Boolean) {
 			return (T[])new Boolean[] {true,false};
@@ -110,7 +112,7 @@ public class Prop<T> implements IProperty<T>, IWatchable<T> {
 		return null;
 	}
 	
-	public Prop watch(ISubscription<T> subscriber) {
+	public Prop<T> watch(ISubscription<T> subscriber) {
 		this.subscriber = subscriber;
 		return this;
 	}
@@ -136,13 +138,14 @@ public class Prop<T> implements IProperty<T>, IWatchable<T> {
 		return this;
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected void updateType(T def) {
 		if (typeClass != def.getClass()) {
-			typeClass = def.getClass();
+			typeClass = (Class<T>)def.getClass();
 			if (currentValue.get() instanceof String) {
 				if (typeClass.isArray()) {
-					currentValue = new StringableArray((T[])def, (String)currentValue.get());
-					defaultValue = new StringableArray((T[])def);
+					currentValue = (IWrapObject<T>) new StringableArray<T>((T[])def, (String)currentValue.get());
+					defaultValue = (IWrapObject<T>) new StringableArray<T>((T[])def);
 				} else {
 					currentValue.fromString(def, ((String)currentValue.get()));
 					defaultValue.set(def);
@@ -190,6 +193,7 @@ public class Prop<T> implements IProperty<T>, IWatchable<T> {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private T unescapeValue(String value) {
 		value = value.trim();
 		if (value.startsWith("\"")) value = value.substring(1, value.length());

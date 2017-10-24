@@ -25,8 +25,8 @@ public class ContainerOpenedEventArgs {
         inventoryId = packet.getGuiId();
         inventoryTitle = packet.getWindowTitle();
         
-        posX = MathHelper.floor_double(player.posX);
-        posY = MathHelper.floor_double(player.posY);
-        posZ = MathHelper.floor_double(player.posZ);
+        posX = MathHelper.floor(player.posX);
+        posY = MathHelper.floor(player.posY);
+        posZ = MathHelper.floor(player.posZ);
     }
 }

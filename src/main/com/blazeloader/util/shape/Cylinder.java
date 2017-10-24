@@ -81,9 +81,9 @@ public class Cylinder implements IShape {
 	}
 	
 	public Vec3d computePoint(Random rand) {
-		double y = MathHelper.getRandomDoubleInRange(rand, 0, height);
-		double pheta = MathHelper.getRandomDoubleInRange(rand, 0, Math.PI * 2);
-		double rho = hollow && Math.abs(y) != height/2 ? rad : MathHelper.getRandomDoubleInRange(rand, 0, rad);
+		double y = MathHelper.nextDouble(rand, 0, height);
+		double pheta = MathHelper.nextDouble(rand, 0, Math.PI * 2);
+		double rho = hollow && Math.abs(y) != height/2 ? rad : MathHelper.nextDouble(rand, 0, rad);
 		
 		return (new Vec3d(rho * Math.cos(pheta) * stretchX, y, rho * Math.sin(pheta) * stretchZ)).rotateYaw(yaw).rotatePitch(pitch);
 	}
@@ -96,10 +96,10 @@ public class Cylinder implements IShape {
 	
 	public boolean isPointInside(Vec3d point) {
 		point = point.rotateYaw(-yaw).rotatePitch(-pitch);
-		point = new Vec3d(point.xCoord / stretchX, point.yCoord, point.zCoord / stretchZ);
-		double y = Math.abs(point.yCoord);
+		point = new Vec3d(point.x / stretchX, point.y, point.z / stretchZ);
+		double y = Math.abs(point.y);
 		if (y < height/2) {
-			double r = Math.sqrt((point.xCoord * point.xCoord) + (point.zCoord * point.zCoord));
+			double r = Math.sqrt((point.x * point.x) + (point.z * point.z));
 			return hollow ? r == rad : r <= rad;
 		}
 		return y == height/2;

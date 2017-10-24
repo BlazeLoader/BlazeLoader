@@ -9,8 +9,9 @@ import java.util.List;
 import org.objectweb.asm.tree.ClassNode;
 
 public class DefaultTransformationMap extends HashMap<String, List<Transformation>> implements TransformationMap {
-    
-    public List<Transformation> getClassMap(String className) {
+	private static final long serialVersionUID = 8722537042207795587L;
+
+	public List<Transformation> getClassMap(String className) {
         if (className == null) {
             throw new IllegalArgumentException("Class name must not be null!");
         }

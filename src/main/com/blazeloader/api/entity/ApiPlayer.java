@@ -6,7 +6,7 @@ import com.blazeloader.util.version.Versions;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.stats.StatisticsFile;
+import net.minecraft.stats.StatisticsManagerServer;
 import net.minecraft.world.WorldServer;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class ApiPlayer {
         MinecraftServer server = ApiServer.getServer();
         if (server != null) {
             String owner = server.getServerOwner();
-            for (WorldServer i : server.worldServers) {
+            for (WorldServer i : server.worlds) {
                 EntityPlayer result = i.getPlayerEntityByName(owner);
                 if (result != null) return result;
             }
@@ -60,13 +60,13 @@ public class ApiPlayer {
     public static EntityPlayer[] getAllPlayers() {
         MinecraftServer server = ApiServer.getServer();
         if (server != null) {
-        	List<EntityPlayerMP> result = server.getPlayerList().getPlayerList();
+        	List<EntityPlayerMP> result = server.getPlayerList().getPlayers();
 			return result.toArray(new EntityPlayer[result.size()]);
         }
         return new EntityPlayer[0];
     }
 
-    public static StatisticsFile getPlayerStatsFile(EntityPlayer player) {
+    public static StatisticsManagerServer getPlayerStatsFile(EntityPlayer player) {
         if (player instanceof EntityPlayerMP) {
             return ((EntityPlayerMP) player).getStatFile();
         }

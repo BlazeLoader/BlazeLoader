@@ -29,7 +29,7 @@ public abstract class JsonDownload implements IDownloadCallback {
         } catch (IOException e) {
 			e.printStackTrace();
 		} catch (JsonSyntaxException e) {
-			BLMain.LOGGER_MAIN.logError("Exception whilst reading json response", e);
+			BLMain.LOGGER_FULL.error("Exception whilst reading json response", e);
 		}
 	}
 	

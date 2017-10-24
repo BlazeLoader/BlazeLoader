@@ -20,6 +20,8 @@ import net.minecraft.world.World;
  * Collection of block data. Can also be read from or written to nbt.
  */
 public class BlockStore extends ArrayList<BlockStore.Entry> implements INBTWritable {
+	private static final long serialVersionUID = -4495071139322159361L;
+	
 	private final HashMap<BlockPos, BlockStore.Entry> map;
 	
 	public BlockStore() {
@@ -100,7 +102,7 @@ public class BlockStore extends ArrayList<BlockStore.Entry> implements INBTWrita
 	/**
 	 * Reads this collection from nbt data
 	 */
-	public void readFromNBT(NBTTagCompound nbt) {
+	public BlockStore readFromNBT(NBTTagCompound nbt) {
 		clear();
 		if (nbt.hasKey("BlocksLog")) {
 			NBTTagList list = (NBTTagList) nbt.getTag("BlocksLog");
@@ -109,6 +111,7 @@ public class BlockStore extends ArrayList<BlockStore.Entry> implements INBTWrita
 				add(new Entry(list.getCompoundTagAt(i)));
 			}
 		}
+		return this;
 	}
 	
 	/**
@@ -127,6 +130,7 @@ public class BlockStore extends ArrayList<BlockStore.Entry> implements INBTWrita
 		}
 	}
 	
+	@Override
 	public void clear() {
 		map.clear();
 		super.clear();
@@ -249,16 +253,21 @@ public class BlockStore extends ArrayList<BlockStore.Entry> implements INBTWrita
 			return ApiBlock.getStringBlockName(getBlock());
 		}
 		
+		/**
+		 * @Deprecated Using metadata directly is highly discouraged
+		 */
+		@Deprecated
 		public int getBlockMetadata() {
 			return blockState.getBlock().getMetaFromState(blockState);
 		}
 		
+		@SuppressWarnings("deprecation")
 		public void setBlockMetadata(int data) {
 			blockState = blockState.getBlock().getStateFromMeta(data);
 		}
 		
 		public void restore(World w, boolean overwrite) {
-			if (overwrite || w.getBlockState(position).getMaterial() == Material.air) {
+			if (overwrite || w.getBlockState(position).getMaterial() == Material.AIR) {
 				w.setBlockState(position, blockState, 2);
 				if (blockEntity != null) {
 					w.setTileEntity(position, blockEntity);
@@ -270,7 +279,9 @@ public class BlockStore extends ArrayList<BlockStore.Entry> implements INBTWrita
 			}
 		}
 		
-		public void readFromNBT(NBTTagCompound nbt) {
+		@Override
+		@SuppressWarnings("deprecation")
+		public Entry readFromNBT(NBTTagCompound nbt) {
 			int posX = nbt.getInteger("posX");
 			int posY = nbt.getInteger("posY");
 			int posZ = nbt.getInteger("posZ");
@@ -284,8 +295,10 @@ public class BlockStore extends ArrayList<BlockStore.Entry> implements INBTWrita
 					blockEntityNBT = nbt.getCompoundTag("tileEntity");
 				}
 			}
+			return this;
 		}
 		
+		@Override
 		public void writeToNBT(NBTTagCompound nbt) {
 			nbt.setInteger("posX", getX());
 			nbt.setInteger("posY", getY());

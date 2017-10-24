@@ -30,7 +30,7 @@ public class BlockRenderRegistry {
 	}
 	
 	public static boolean doRenderTileEntity(Block block, ItemStack stack) {
-		ITileRenderer render = ((ITileEntityRendered)block).getTileRenderer();
+		ITileRenderer<?> render = ((ITileEntityRendered<?>)block).getTileRenderer();
 		if (render == null) return false;
 		if (!render.customRenderPass(stack)) {
 			TileEntity tile = render.getTileEntityForRender(stack); 

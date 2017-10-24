@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.blazeloader.api.privileged.IEntityVillager;
+import com.blazeloader.api.privileged.ITasked;
 
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.inventory.InventoryBasic;
@@ -41,7 +42,7 @@ public final class Professions {
 	}
 	
 	public static int getProfessionId(EntityVillager villager) {
-		return Math.max((Integer)villager.getDataManager().get(EntityVillager.PROFESSION),0);
+		return Math.max((Integer)villager.getDataManager().get(((IEntityVillager)villager).getProfessionDataParameter()),0);
 	}
 	
 	public Boolean checkMatingConditions(EntityVillager villager, boolean fixedMarkiplier, int markiplier) {
@@ -81,7 +82,7 @@ public final class Professions {
 	public boolean onGrownUp(EntityVillager villager) {
 		IProfession profession = get(getProfessionId(villager));
 		if (profession == null) return false;
-		profession.setAdditionalAItasks(villager.tasks);
+		profession.setAdditionalAItasks(((ITasked)villager).getAITasks());
 		return true;
 	}
 	
@@ -124,7 +125,7 @@ public final class Professions {
 		IProfession profession = get(getProfessionId(villager));
 		if (profession == null) return false;
 		if (!((IEntityVillager)villager).areAdditionalTasksSet()) {
-			profession.setAdditionalAItasks(villager.tasks);
+			profession.setAdditionalAItasks(((ITasked)villager).getAITasks());
 		}
 		return true;
 	}

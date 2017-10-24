@@ -1,16 +1,16 @@
 package com.blazeloader.api.recipe;
 
-import java.util.List;
-
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapelessRecipes;
+import net.minecraft.util.NonNullList;
 
 public class ShapelessRecipe extends ShapelessRecipes {
 	
-	protected final ItemStack[] recipeItems;
+	protected final NonNullList<Ingredient> recipeItems;
 	
-	public ShapelessRecipe(ItemStack output, List input) {
-		super(output, input);
-		recipeItems = (ItemStack[]) input.toArray(new ItemStack[input.size()]);
+	public ShapelessRecipe(String group, ItemStack output, NonNullList<Ingredient> input) {
+		super(group, output, input);
+		recipeItems = input;
 	}
 }

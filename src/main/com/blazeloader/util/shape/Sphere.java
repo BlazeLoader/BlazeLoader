@@ -56,8 +56,8 @@ public class Sphere implements IShape {
 	
 	private double computeSpawnableSpace() {
 		if (hollow) {
-			if (stretch.xCoord == stretch.xCoord && stretch.yCoord == stretch.zCoord) {
-				double radius = rad * stretch.xCoord;
+			if (stretch.x == stretch.x && stretch.y == stretch.z) {
+				double radius = rad * stretch.x;
 				return 4 * Math.PI * radius * radius;
 			}
 			return computeEllipsoidArea(rad, stretch);
@@ -67,18 +67,18 @@ public class Sphere implements IShape {
 	
 	public static double computeEllipsoidArea(double rad, Vec3d stretch) {
 		double p = 1.6075;
-		double result = Math.pow(rad * stretch.xCoord, p) * Math.pow(rad * stretch.yCoord, p);
-		result += Math.pow(rad * stretch.xCoord, p) * Math.pow(rad * stretch.zCoord, p);
-		result += Math.pow(rad * stretch.yCoord, p) * Math.pow(rad * stretch.yCoord, p);
+		double result = Math.pow(rad * stretch.x, p) * Math.pow(rad * stretch.y, p);
+		result += Math.pow(rad * stretch.x, p) * Math.pow(rad * stretch.z, p);
+		result += Math.pow(rad * stretch.y, p) * Math.pow(rad * stretch.y, p);
 		result /= 3;
 		return 2 * Math.PI * Math.pow(result, 1/p);
 	}
 	
 	public static double computeEllipsoidVolume(double rad, Vec3d stretch) {
 		double result = (4/3) * Math.PI;
-		result *= (rad * stretch.xCoord);
-		result *= (rad * stretch.yCoord);
-		result *= (rad * stretch.zCoord);
+		result *= (rad * stretch.x);
+		result *= (rad * stretch.y);
+		result *= (rad * stretch.z);
 		return result;
 	}
 	
@@ -98,14 +98,14 @@ public class Sphere implements IShape {
 		double rad = this.rad;
 		
 		if (!hollow) {
-			rad = MathHelper.getRandomDoubleInRange(rand, 0, rad);
+			rad = MathHelper.nextDouble(rand, 0, rad);
 		}
 		
-		double z = MathHelper.getRandomDoubleInRange(rand, -rad, rad);
-		double phi = MathHelper.getRandomDoubleInRange(rand, 0, Math.PI * 2);
+		double z = MathHelper.nextDouble(rand, -rad, rad);
+		double phi = MathHelper.nextDouble(rand, 0, Math.PI * 2);
 		double theta = Math.asin(z / rad);
 		
-		return new Vec3d(rad * Math.cos(theta) * Math.cos(phi) * stretch.xCoord, rad * Math.cos(theta) * Math.sin(phi) * stretch.yCoord, z * stretch.zCoord).rotateYaw(yaw).rotatePitch(pitch);
+		return new Vec3d(rad * Math.cos(theta) * Math.cos(phi) * stretch.x, rad * Math.cos(theta) * Math.sin(phi) * stretch.y, z * stretch.z).rotateYaw(yaw).rotatePitch(pitch);
 	}
 	
 	public Sphere setRotation(float u, float v) {
@@ -116,7 +116,7 @@ public class Sphere implements IShape {
 	
 	public boolean isPointInside(Vec3d point) {
 		point = point.rotateYaw(-yaw).rotatePitch(-pitch);
-		point = new Vec3d(point.xCoord / stretch.xCoord, point.yCoord / stretch.yCoord, point.zCoord / stretch.zCoord);
+		point = new Vec3d(point.x / stretch.x, point.y / stretch.y, point.z / stretch.z);
 		double dist = point.lengthVector();
 		return hollow ? dist == rad : dist <= rad;
 	}

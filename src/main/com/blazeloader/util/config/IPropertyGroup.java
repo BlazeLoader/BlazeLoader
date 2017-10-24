@@ -1,9 +1,12 @@
 package com.blazeloader.util.config;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 /**
  * Container grouping numerous properties together in a config file.
  */
-public interface IPropertyGroup extends Iterable<IProperty> {
+public interface IPropertyGroup extends Iterable<IProperty<?>> {
 	
 	/**
 	 * Returns the name attached to the section.
@@ -35,4 +38,10 @@ public interface IPropertyGroup extends Iterable<IProperty> {
 	 * @return Resulting property object.
 	 */
 	public <T> IProperty<T> get(String key, T def);
+	
+	public <I extends IProperty<?>> Collection<I> values();
+	
+	public default Iterator<IProperty<?>> iterator() {
+		return values().iterator();
+	}
 }

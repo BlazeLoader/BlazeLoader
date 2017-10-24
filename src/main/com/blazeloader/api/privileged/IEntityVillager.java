@@ -1,11 +1,14 @@
 package com.blazeloader.api.privileged;
 
+import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.village.MerchantRecipeList;
 
 /**
  * Accessor methods for private fields on EntityVillager.
  */
 public interface IEntityVillager {
+	
+	public DataParameter<Integer> getProfessionDataParameter();
 	
 	/**Returns true if this villager has performed its initial setup of AI Tasks and tradelists.*/
 	public boolean areAdditionalTasksSet();

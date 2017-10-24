@@ -78,7 +78,7 @@ public class PlayerIdent implements INBTWritable, IStringable<PlayerIdent> {
 	}
 	
 	private static UUID lookupUUID(String username) {
-		return UUID.fromString(PreYggdrasilConverter.func_187473_a(ApiServer.getServer(), username));
+		return UUID.fromString(PreYggdrasilConverter.convertMobOwnerIfNeeded(ApiServer.getServer(), username));
 	}
 	
 	/**
@@ -148,9 +148,10 @@ public class PlayerIdent implements INBTWritable, IStringable<PlayerIdent> {
 		tagCompound.setString("Name", getGameProfile().getName());
 	}
 	
-	public void readFromNBT(NBTTagCompound tagCompound) {
+	public PlayerIdent readFromNBT(NBTTagCompound tagCompound) {
 		uuid = new UUID(tagCompound.getLong("UUIDMost"), tagCompound.getLong("UUIDLeast"));
 		gameProfile = new GameProfile(uuid, tagCompound.getString("Name"));
+		return this;
 	}
 	
 	public String toString() {

@@ -6,25 +6,32 @@ import com.mumfrey.liteloader.client.overlays.IMinecraft;
 /**
  * Client side tick functions
  *
- * WARNING:  These functions may not actually do what they seem
- *
  */
 public class ApiTickClient {
     /**
-     * Gets the game's tick rate.  Uses reflection only on first run.
+     * Gets the game's tick rate.
      *
      * @return Returns the game's current tick rate.
      */
     public static float getTPS() {
-        return ((IMinecraft)ApiClient.getClient()).getTimer().ticksPerSecond;
+        return getGameTimer().getTicksPerSecond();
     }
-
+    
     /**
      * Sets the game tick rate.
      *
      * @param tps The new tick rate.
      */
     public static void setTPS(float tps) {
-    	((IMinecraft)ApiClient.getClient()).getTimer().ticksPerSecond = tps;
+    	getGameTimer().setTicksPerSecond(tps);;
+    }
+    
+    /**
+     * Gets the timer currently used by the game.
+     * 
+     * @return ITimer instance
+     */
+    public static ITimer getGameTimer() {
+    	return (ITimer)((IMinecraft)ApiClient.getClient()).getTimer();
     }
 }

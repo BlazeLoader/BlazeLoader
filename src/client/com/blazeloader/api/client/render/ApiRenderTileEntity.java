@@ -1,5 +1,7 @@
 package com.blazeloader.api.client.render;
 
+import com.blazeloader.event.mixin.client.MTileEntityRendererDispatcher;
+
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
@@ -22,7 +24,7 @@ public class ApiRenderTileEntity {
 	 * @return	True if there is a renderer, false otherwise.
 	 */
 	public static <T extends TileEntity> boolean hasSpecialRenderer(T tileEntity) {
-		return TileEntityRendererDispatcher.instance.getSpecialRenderer(tileEntity) != null;
+		return TileEntityRendererDispatcher.instance.getRenderer(tileEntity) != null;
 	}
 	
 	/**
@@ -32,8 +34,8 @@ public class ApiRenderTileEntity {
 	 * @param clazz		Tile entity class
 	 * @return	A renderer that may be used with this tile entity class.
 	 */
-	public static TileEntitySpecialRenderer getSpecialRenderer(Class<? extends TileEntity> clazz) {
-		return TileEntityRendererDispatcher.instance.getSpecialRendererByClass(clazz);
+	public static <T extends TileEntity> TileEntitySpecialRenderer<T> getSpecialRenderer(Class<T> clazz) {
+		return TileEntityRendererDispatcher.instance.getRenderer(clazz);
 	}
 	
 	/**
@@ -43,8 +45,8 @@ public class ApiRenderTileEntity {
 	 * @param tileEntity		Tile entity
 	 * @return	A renderer that may be used with this tile entity.
 	 */
-	public static <T extends TileEntity> TileEntitySpecialRenderer getSpecialRenderer(T tileEntity) {
-		return TileEntityRendererDispatcher.instance.getSpecialRenderer(tileEntity);
+	public static <T extends TileEntity> TileEntitySpecialRenderer<T> getSpecialRenderer(T tileEntity) {
+		return TileEntityRendererDispatcher.instance.getRenderer(tileEntity);
 	}
 	
 	/**
@@ -53,8 +55,8 @@ public class ApiRenderTileEntity {
 	 * @param clazz		Tile entity class
 	 * @param renderer	The renderer to use
 	 */
-	public static void registerSpecialRenderer(Class<? extends TileEntity> clazz, TileEntitySpecialRenderer renderer) {
-		TileEntityRendererDispatcher.instance.mapSpecialRenderers.put(clazz, renderer);
+	public static <T extends TileEntity> void registerSpecialRenderer(Class<T> clazz, TileEntitySpecialRenderer<T> renderer) {
+		((MTileEntityRendererDispatcher)TileEntityRendererDispatcher.instance).getRegistry().put(clazz, renderer);
 	}
 	
 	/**
@@ -68,6 +70,6 @@ public class ApiRenderTileEntity {
 	 * @param destroyStage	Destruction amount, or -1 for no destruction
 	 */
 	public static void renderTileEntity(TileEntity tile, double x, double y, double z, float partialTicks, int destroyStage) {
-		TileEntityRendererDispatcher.instance.renderTileEntityAt(tile, x, y, z, partialTicks, destroyStage);
+		TileEntityRendererDispatcher.instance.render(tile, x, y, z, partialTicks, destroyStage);
 	}
 }

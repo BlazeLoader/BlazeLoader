@@ -34,7 +34,8 @@ public class BLOBFTable<T extends BLOBFTable<T>.BLOBFMapping> extends DirectOBFT
     	return tableMappings.containsKey(type) && tableMappings.getChecked(type).hasType(name, level);
     }
     
-    protected T createMap() {
+    @SuppressWarnings("unchecked")
+	protected T createMap() {
     	return (T)new BLOBFMapping();
     }
     

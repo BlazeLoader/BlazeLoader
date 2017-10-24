@@ -2,6 +2,7 @@ package com.blazeloader.api.toolset;
 
 import com.google.common.collect.Multimap;
 
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemAxe;
 import net.minecraft.item.ItemStack;
@@ -40,7 +41,7 @@ public class ToolAxe extends ItemAxe implements ITool {
     }
 
     @Override
-    public Multimap getItemAttributeModifiers(EntityEquipmentSlot slot) {
+    public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot slot) {
     	return attributes.getAttributeModifiers(slot, super.getItemAttributeModifiers(slot), ATTACK_DAMAGE_MODIFIER, ATTACK_SPEED_MODIFIER, damageVsEntity, attackSpeed, "Tool modifier");
     }
 }

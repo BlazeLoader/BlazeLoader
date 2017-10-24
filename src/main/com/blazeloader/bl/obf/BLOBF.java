@@ -2,6 +2,7 @@ package com.blazeloader.bl.obf;
 
 import java.net.URL;
 
+import com.blazeloader.util.regex.Patterns;
 import com.blazeloader.util.transformers.ONFTransformer;
 import com.blazeloader.util.version.Versions;
 import com.mumfrey.liteloader.core.runtime.Obf;
@@ -9,7 +10,6 @@ import com.mumfrey.liteloader.core.runtime.Obf;
 import net.acomputerdog.OBFUtil.map.ObfMapSrg;
 import net.acomputerdog.OBFUtil.map.TargetType;
 import net.acomputerdog.OBFUtil.parse.types.ONFParser;
-import net.acomputerdog.core.java.Patterns;
 
 /**
  * BlazeLoader extension of LL's Obf class
@@ -73,17 +73,18 @@ public class BLOBF extends Obf implements ObfMapSrg.Entry {
     /**
      * BL's central obfuscation table, contains all raw package, class, method, and field obfuscation mappings.
      */
-    public static final BLOBFTable OBF = loadOBF();
+    public static final BLOBFTable<?> OBF = loadOBF();
     
-    private static BLOBFTable loadOBF() {
-        BLOBFTable obf = new BLOBFTable();
+    private static BLOBFTable<?> loadOBF() {
+        @SuppressWarnings("rawtypes")
+		BLOBFTable<?> obf = new BLOBFTable();
         ONFParser parser = new ONFParser();
         loadEntries(parser, "blazeloader", obf, true);
         ONFTransformer.setONFS(parser.getDetectedTransformations());
         return obf;
     }
     
-    private static void loadEntries(ONFParser parser, String filename, BLOBFTable obf, boolean mustThrow) {
+    private static void loadEntries(ONFParser parser, String filename, BLOBFTable<?> obf, boolean mustThrow) {
     	try {
     		URL stream = BLOBF.class.getResource("/conf/" + filename + ".onf");
     		parser.loadEntries(stream, obf, true);

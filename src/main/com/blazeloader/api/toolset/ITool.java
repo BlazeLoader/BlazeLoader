@@ -29,7 +29,7 @@ public interface ITool {
 	 * Checks if the item represented by a given entity contains a tool, either in vanilla or by implementing this interface.
 	 */
 	public static boolean isTool(Entity entity) {
-		return entity instanceof EntityItem && isTool(((EntityItem)entity).getEntityItem());
+		return entity instanceof EntityItem && isTool(((EntityItem)entity).getItem());
 	}
 	
 	/**

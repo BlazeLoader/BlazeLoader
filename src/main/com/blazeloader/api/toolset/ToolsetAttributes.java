@@ -23,7 +23,7 @@ public class ToolsetAttributes {
             STONE = new ToolsetAttributes(ToolMaterial.STONE, -3.2f),
             IRON = new ToolsetAttributes(ToolMaterial.IRON, -3.1f),
             DIAMOND = new ToolsetAttributes(ToolMaterial.DIAMOND, -3),
-            EMERALD = new ToolsetAttributes("EMERALD", Items.emerald, 3, 1561, 8, 3, -3, 10),
+            EMERALD = new ToolsetAttributes("EMERALD", Items.EMERALD, 3, 1561, 8, 3, -3, 10),
             GOLD = new ToolsetAttributes(ToolMaterial.GOLD, -3);
 
     private final String string;
@@ -118,10 +118,10 @@ public class ToolsetAttributes {
         return getItem() == stack.getItem() && (data < 0 || data == stack.getItemDamage());
     }
 
-    public Multimap getAttributeModifiers(EntityEquipmentSlot slot, Multimap map, UUID damageId, UUID speedId, double damage, double speed, String name) {
+    public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, Multimap<String, AttributeModifier> map, UUID damageId, UUID speedId, double damage, double speed, String name) {
     	if (slot == EntityEquipmentSlot.MAINHAND) {
-    		map.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(damageId, name, damage, 0));
-        	map.put(SharedMonsterAttributes.ATTACK_SPEED.getAttributeUnlocalizedName(), new AttributeModifier(speedId, name, speed, 0));
+    		map.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(damageId, name, damage, 0));
+        	map.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(speedId, name, speed, 0));
     	}
         return map;
     }

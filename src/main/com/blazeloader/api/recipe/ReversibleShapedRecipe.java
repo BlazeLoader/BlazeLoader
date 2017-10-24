@@ -2,13 +2,15 @@ package com.blazeloader.api.recipe;
 
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 
 public class ReversibleShapedRecipe extends ShapedRecipe implements IReversibleRecipe {
 	private boolean anyDirection = true;
 	
-	public ReversibleShapedRecipe(int width, int height, ItemStack[] input, ItemStack output) {
-		super(width, height, input, output);
+	public ReversibleShapedRecipe(String group, int width, int height, NonNullList<Ingredient> input, ItemStack output) {
+		super(group, width, height, input, output);
 	}
 
 	public ReversibleShapedRecipe setReverseOnly() {
@@ -24,7 +26,7 @@ public class ReversibleShapedRecipe extends ShapedRecipe implements IReversibleR
 		return ItemStack.areItemStacksEqual(output, getRecipeOutput());
 	}
 	
-	public ItemStack[] getRecipeInput() {
+	public NonNullList<Ingredient> getRecipeInput() {
 		return recipeItems;
 	}
 }

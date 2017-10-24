@@ -42,11 +42,12 @@ public abstract class BLCommandBase extends CommandBase {
         }
     }
     
+    @Override
     public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
     	if (getIgnorePermissionLevel()) {
     		//EntityPlayerMP is hard wired to return false for anyone that is not an OP for any command except for /help
     		//It's a terrible design
-    		return sender.canCommandSenderUseCommand(getRequiredPermissionLevel(), "help");
+    		return sender.canUseCommand(getRequiredPermissionLevel(), "help");
     	}
     	return super.checkPermission(server, sender);
     }
@@ -86,7 +87,7 @@ public abstract class BLCommandBase extends CommandBase {
      * Utility method to get usernames for players on the server.
      */
     protected static String[] getListOfPlayerUsernames() {
-        return ApiServer.getServer().getAllUsernames();
+        return ApiServer.getServer().getOnlinePlayerNames();
     }
     
     /**
@@ -96,7 +97,7 @@ public abstract class BLCommandBase extends CommandBase {
      */
     @Override
     public String toString() {
-        return getCommandName();
+        return getName();
     }
 
     /**

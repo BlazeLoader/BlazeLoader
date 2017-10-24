@@ -4,7 +4,7 @@ import com.blazeloader.bl.mod.BLMod;
 import com.blazeloader.event.listeners.args.ContainerOpenedEventArgs;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.particle.EntityFX;
+import net.minecraft.client.particle.Particle;
 
 /**
  * Interface for mods that handle game events not handled by vanilla.  Override events are only called if the game is unable to handle the event on it's own.
@@ -24,7 +24,7 @@ public interface OverrideListener extends BLMod {
      * @param currParticle The particle that the previous mod generated.  Set to null if no mod other has generated a particle yet
      * @return A generated particle
      */
-    public EntityFX onSpawnParticle(int particleId, double x, double y, double z, double p1, double p2, double p3, EntityFX currParticle);
+    public Particle onSpawnParticle(int particleId, double x, double y, double z, double p1, double p2, double p3, Particle currParticle);
 
 
     /**

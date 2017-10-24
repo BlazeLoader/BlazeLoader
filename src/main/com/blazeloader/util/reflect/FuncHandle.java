@@ -25,7 +25,7 @@ public class FuncHandle {
 	
 	protected final String declaringContext;
 	
-	protected FuncHandle(Class interfaceType, Class context, Class returnType, String name, boolean isStatic, Class... pars) {
+	protected FuncHandle(Class<?> interfaceType, Class<?> context, Class<?> returnType, String name, boolean isStatic, Class<?>... pars) {
 		staticMethod = isStatic;
 		hasLambda = interfaceType != null;
 		declaringContext = context.getCanonicalName();
@@ -33,11 +33,11 @@ public class FuncHandle {
 		lookupMethod(interfaceType, context, name, getter);
 	}
 	
-	protected FuncHandle(Class interfaceType, boolean isStatic, BLOBF obf) {
+	protected FuncHandle(Class<?> interfaceType, boolean isStatic, BLOBF obf) {
 		this(interfaceType, isStatic, obf.getValue());
 	}
 	
-	protected FuncHandle(Class interfaceType, boolean isStatic, String descriptor) {
+	protected FuncHandle(Class<?> interfaceType, boolean isStatic, String descriptor) {
 		String ref = descriptor.split("\\(")[0].trim();
 		
 		String[] methodRef = ref.split("\\.");
@@ -56,7 +56,7 @@ public class FuncHandle {
 		}
 		ref = descriptor.replace(className + "." + methodName, "").trim();
 		
-		Class contextC = Interop.getDeclaredClass(className);
+		Class<?> contextC = Interop.getDeclaredClass(className);
 		
 		staticMethod = isStatic;
 		hasLambda = interfaceType != null;
@@ -78,7 +78,7 @@ public class FuncHandle {
 		return caller;
 	}
 	
-	private void lookupMethod(Class interfaceType, Class context, String name, MethodType getter) {
+	private void lookupMethod(Class<?> interfaceType, Class<?> context, String name, MethodType getter) {
 		funcName = name;
 		Lookup caller = trustedLookup(MethodHandles.lookup().in(context));
 		
@@ -106,7 +106,7 @@ public class FuncHandle {
 		}
 	}
 	
-	private MethodHandle findMethod(MethodHandles.Lookup caller, Class context, String name, MethodType getter) throws Throwable {
+	private MethodHandle findMethod(MethodHandles.Lookup caller, Class<?> context, String name, MethodType getter) throws Throwable {
 		try {
 			if (isConstr(name)) {
 				return caller.findConstructor(context, getter);
@@ -117,7 +117,7 @@ public class FuncHandle {
 			}
 		} catch (Throwable e) {
 			if (isConstr(name)) {
-				Constructor c = context.getConstructor(getter.parameterArray());
+				Constructor<?> c = context.getConstructor(getter.parameterArray());
 				c.setAccessible(true);
 				return caller.unreflectConstructor(c);
 			} else {
@@ -136,7 +136,7 @@ public class FuncHandle {
 	private String buildParameterString() {
 		String parameterTypes = "";
 		if (target != null) {
-			Class[] pars = target.type().parameterArray();
+			Class<?>[] pars = target.type().parameterArray();
 			for (int i = 0; i < pars.length; i++) {
 				if (!parameterTypes.isEmpty()) {
 					parameterTypes += ",";

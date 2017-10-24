@@ -10,7 +10,7 @@ public final class Reflect {
 	 * Finds a hook into a field by a given BLOBF mapping.
 	 */
 	public static <T, V> Var<T, V> lookupField(BLOBF obf) {
-		return new Var(obf);
+		return new Var<T, V>(obf);
 	}
 	
 	/**
@@ -21,14 +21,14 @@ public final class Reflect {
 	 * @param name		The name of this field
 	 */
 	public static <T, V> Var<T, V> lookupField(Class<T> declarer, Class<V> type, String name) {
-		return new Var(declarer, type, name);
+		return new Var<T, V>(declarer, type, name);
 	}
 	
 	/**
 	 * Finds a hook into a field by its string descriptor.
 	 */
 	public static <T, V> Var<T, V> lookupField(String descriptor) {
-		return new Var(descriptor);
+		return new Var<T, V>(descriptor);
 	}
 	
 	/**
@@ -36,8 +36,8 @@ public final class Reflect {
 	 * <p>
 	 * This version does not support lambda creation.
 	 */
-	public static <I, R> SimpleFunc<I, R> lookupMethod(BLOBF obf) {
-		return new SimpleFunc(obf);
+	public static <I, R> Func<I, R> lookupMethod(BLOBF obf) {
+		return new Func<I, R>(obf);
 	}
 	
 	/**
@@ -50,8 +50,8 @@ public final class Reflect {
 	 * @param name				The method name
 	 * @param pars				The parameter types this method takes
 	 */
-	public static <I, R> SimpleFunc<I, R> lookupMethod(Class<I> declarer, Class<R> returnType, String name, Class... pars) {
-		return new SimpleFunc(declarer, returnType, name, pars);
+	public static <I, R> Func<I, R> lookupMethod(Class<I> declarer, Class<R> returnType, String name, Class<?>... pars) {
+		return new Func<I, R>(declarer, returnType, name, pars);
 	}
 	
 	/**
@@ -59,8 +59,8 @@ public final class Reflect {
 	 * 
 	 * @param interfaceType		An interface for the generated lambda to implement. Must contain a method matching the one you wish to access.
 	 */
-	public static <I, T, R> Func<I, T, R> lookupMethod(Class<T> interfaceType, BLOBF obf) {
-		return new Func(interfaceType, obf);
+	public static <I, T, R> Lamda<I, T, R> lookupMethod(Class<T> interfaceType, BLOBF obf) {
+		return new Lamda<I, T, R>(interfaceType, obf);
 	}
 	
 	/**
@@ -72,8 +72,8 @@ public final class Reflect {
 	 * @param name				The method name
 	 * @param pars				The parameter types this method takes
 	 */
-	public static <I, T, R> Func<I, T, R> lookupMethod(Class<T> interfaceType, Class<I> declarer, Class<R> returnType, String name, Class... pars) {
-		return new Func(interfaceType, declarer, returnType, name, pars);
+	public static <I, T, R> Lamda<I, T, R> lookupMethod(Class<T> interfaceType, Class<I> declarer, Class<R> returnType, String name, Class<?>... pars) {
+		return new Lamda<I, T, R>(interfaceType, declarer, returnType, name, pars);
 	}
 	
 	/**
@@ -81,8 +81,8 @@ public final class Reflect {
 	 * 
 	 * @param interfaceType		An interface for the generated lambda to implement. Must contain a method matching the one you wish to access.
 	 */
-	public static <I, T, R> Func<I, T, R> lookupMethod(Class<T> interfaceType, String descriptor) {
-		return new Func(interfaceType, descriptor);
+	public static <I, T, R> Lamda<I, T, R> lookupMethod(Class<T> interfaceType, String descriptor) {
+		return new Lamda<I, T, R>(interfaceType, descriptor);
 	}
 	
 	/**
@@ -90,15 +90,15 @@ public final class Reflect {
 	 * <p>
 	 * This version does not support lambda creation.
 	 */
-	public static <I, R> SimpleFunc<I, R> lookupMethod(String descriptor) {
-		return new SimpleFunc(descriptor);
+	public static <I, R> Func<I, R> lookupMethod(String descriptor) {
+		return new Func<I, R>(descriptor);
 	}
 	
 	/**
 	 * Finds a hook into a static field by a given BLOBF mapping.
 	 */
 	public static <T, V> Var<T, V> lookupStaticField(BLOBF obf) {
-		return new Var(true, obf);
+		return new Var<T, V>(true, obf);
 	}
 	
 	/**
@@ -109,14 +109,14 @@ public final class Reflect {
 	 * @param name		The name of this field
 	 */
 	public static <T, V> Var<T, V> lookupStaticField(Class<T> declarer, Class<V> type, String name) {
-		return new Var(declarer, type, true, name);
+		return new Var<T, V>(declarer, type, true, name);
 	}
 	
 	/**
 	 * Finds a hook into a static field by its string descriptor.
 	 */
 	public static <T, V> Var<T, V> lookupStaticField(String descriptor) {
-		return new Var(true, descriptor);
+		return new Var<T, V>(true, descriptor);
 	}
 	
 	/**
@@ -124,8 +124,8 @@ public final class Reflect {
 	 * <p>
 	 * This version does not support lambda creation.
 	 */
-	public static <I, R> SimpleFunc<I, R> lookupStaticMethod(BLOBF obf) {
-		return new SimpleFunc(true, obf);
+	public static <I, R> Func<I, R> lookupStaticMethod(BLOBF obf) {
+		return new Func<I, R>(true, obf);
 	}
 	
 	/**
@@ -138,8 +138,8 @@ public final class Reflect {
 	 * @param name				The method name
 	 * @param pars				The parameter types this method takes
 	 */
-	public static <I, R> SimpleFunc<I, R> lookupStaticMethod(Class<I> declarer, Class<R> returnType, String name, Class... pars) {
-		return new SimpleFunc(declarer, returnType, name, true, pars);
+	public static <I, R> Func<I, R> lookupStaticMethod(Class<I> declarer, Class<R> returnType, String name, Class<?>... pars) {
+		return new Func<I, R>(declarer, returnType, name, true, pars);
 	}
 	
 	/**
@@ -147,8 +147,8 @@ public final class Reflect {
 	 * 
 	 * @param interfaceType		An interface for the generated lambda to implement. Must contain a method matching the one you wish to access.
 	 */
-	public static <I, T, R> Func<I, T, R> lookupStaticMethod(Class<T> interfaceType, BLOBF obf) {
-		return new Func(interfaceType, true, obf);
+	public static <I, T, R> Lamda<I, T, R> lookupStaticMethod(Class<T> interfaceType, BLOBF obf) {
+		return new Lamda<I, T, R>(interfaceType, true, obf);
 	}
 	
 	/**
@@ -160,8 +160,8 @@ public final class Reflect {
 	 * @param name				The method name
 	 * @param pars				The parameter types this method takes
 	 */
-	public static <I, T, R> Func<I, T, R> lookupStaticMethod(Class<T> interfaceType, Class<I> declarer, Class<R> returnType, String name, Class... pars) {
-		return new Func(interfaceType, declarer, returnType, name, true, pars);
+	public static <I, T, R> Lamda<I, T, R> lookupStaticMethod(Class<T> interfaceType, Class<I> declarer, Class<R> returnType, String name, Class<?>... pars) {
+		return new Lamda<I, T, R>(interfaceType, declarer, returnType, name, true, pars);
 	}
 	
 	/**
@@ -169,8 +169,8 @@ public final class Reflect {
 	 * 
 	 * @param interfaceType		An interface for the generated lambda to implement. Must contain a method matching the one you wish to access.
 	 */
-	public static <I, T, R> Func<I, T, R> lookupStaticMethod(Class<T> interfaceType, String descriptor) {
-		return new Func(interfaceType, true, descriptor);
+	public static <I, T, R> Lamda<I, T, R> lookupStaticMethod(Class<T> interfaceType, String descriptor) {
+		return new Lamda<I, T, R>(interfaceType, true, descriptor);
 	}
 	
 	/**
@@ -178,8 +178,8 @@ public final class Reflect {
 	 * <p>
 	 * This version does not support lambda creation.
 	 */
-	public static <I, R> SimpleFunc<I, R> lookupStaticMethod(String descriptor) {
-		return new SimpleFunc(true, descriptor);
+	public static <I, R> Func<I, R> lookupStaticMethod(String descriptor) {
+		return new Func<I, R>(true, descriptor);
 	}
 	
 	/**
@@ -188,21 +188,21 @@ public final class Reflect {
 	 * @param declarer	Class owner
 	 * @param pars		Parameters
 	 */
-	public static <I> Constr<I> lookupConstructor(Class<I> declarer, Class... pars) {
-		return new Constr(declarer, pars);
+	public static <I> Constr<I> lookupConstructor(Class<I> declarer, Class<?>... pars) {
+		return new Constr<I>(declarer, pars);
 	}
 	
 	/**
 	 * Finds a hook into a constructor by the BLOBF class description
 	 */
 	public static <I> Constr<I> lookupConstructor(BLOBF obf) {
-		return new Constr(obf);
+		return new Constr<I>(obf);
 	}
 	
 	/**
 	 * Finds a hook into a constructor by its string descriptor
 	 */
 	public static <I> Constr<I> lookupConstructor(String descriptor) {
-		return new Constr(descriptor);
+		return new Constr<I>(descriptor);
 	}
 }

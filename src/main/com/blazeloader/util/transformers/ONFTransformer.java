@@ -2,13 +2,12 @@ package com.blazeloader.util.transformers;
 
 import java.util.List;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
 
 import com.blazeloader.bl.obf.AccessLevel;
 import com.blazeloader.bl.obf.BLOBF;
 import com.blazeloader.bl.obf.OBFLevel;
+import com.blazeloader.util.regex.Patterns;
 import com.blazeloader.util.transformers.mapping.DefaultTransformationMap;
 import com.blazeloader.util.transformers.mapping.TransformationMap;
 import com.blazeloader.util.transformers.transformations.FieldSelector;
@@ -20,10 +19,8 @@ import com.blazeloader.util.transformers.transformations.Transformation;
 
 import net.acomputerdog.OBFUtil.map.TargetType;
 import net.acomputerdog.OBFUtil.parse.types.ONFParser.DetectedTransformation;
-import net.acomputerdog.core.java.Patterns;
-import net.minecraft.launchwrapper.IClassTransformer;
 
-public class ONFTransformer implements IClassTransformer {
+public class ONFTransformer extends BasicTransformer {
 	private static boolean initialised = false;
 	private static List<DetectedTransformation> onfs = null;
 
@@ -87,17 +84,8 @@ public class ONFTransformer implements IClassTransformer {
     	return null;
     }
 	
-	public byte[] transform(String name, String transformedName, byte[] bytes) {
-		if (name == null || transformedName == null || bytes == null) {
-			return bytes;
-		}
-        ClassNode classNode = new ClassNode();
-        new ClassReader(bytes).accept(classNode, 0);
-        if (transformations.applyAll(transformedName, classNode)) {
-            ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-            classNode.accept(writer);
-            return writer.toByteArray();
-        }
-        return bytes; //return original class if it was not transformed
+    
+    public boolean transform(String transformedName, ClassNode classNode) {
+    	return transformations.applyAll(transformedName, classNode);
     }
 }

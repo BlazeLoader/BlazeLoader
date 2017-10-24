@@ -1,6 +1,8 @@
 package com.blazeloader.api.client.render;
 
 import com.blazeloader.api.client.ApiClient;
+import com.blazeloader.api.client.privileged.IMinecraft;
+import com.blazeloader.event.mixin.client.MBlockStateMapper;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.BlockModelShapes;
@@ -76,11 +78,11 @@ public class ApiRenderBlock {
      */
     public static void swapoutBlockModels(Block original, Block block) {
     	BlockModelShapes mapper = getModelManager().getBlockModelShapes();
-    	mapper.getBlockStateMapper().registerBlockStateMapper(block, (IStateMapper)mapper.getBlockStateMapper().blockStateMap.get(original));
+    	mapper.getBlockStateMapper().registerBlockStateMapper(block, ((MBlockStateMapper)mapper.getBlockStateMapper()).getBlockStateMap().get(original));
     	mapper.reloadModels();
     }
     
     private static ModelManager getModelManager() {
-    	return ApiClient.getClient().modelManager;
+    	return ((IMinecraft)ApiClient.getClient()).getModelManager();
     }
 }

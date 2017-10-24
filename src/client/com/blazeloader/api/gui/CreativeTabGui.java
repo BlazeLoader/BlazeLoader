@@ -37,6 +37,7 @@ public class CreativeTabGui extends GuiContainerCreative {
 		super(player);
 	}
 	
+	@Override
 	public void initGui() {
 		super.initGui();
 		if (Versions.isForgeInstalled()) {
@@ -61,36 +62,38 @@ public class CreativeTabGui extends GuiContainerCreative {
 	}
 	
 	public boolean canMoveForward() {
-		return pageIndex < (CreativeTabs.creativeTabArray.length - 2)/10;
+		return pageIndex < (ApiGui.getCreativeTabsRegistry().length - 2)/10;
 	}
 	
 	public boolean canMoveBack() {
 		return pageIndex > 0;
 	}
 	
+	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 		if (mouseButton == 0) {
 			if (isOverNextPage(mouseX, mouseY)) {
 				nextPage();
-				mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1));
+				mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1));
 				return;
 			}
 			if (isOverPrevPage(mouseX, mouseY)) {
 				prevPage();
-				mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ui_button_click, 1));
+				mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1));
 				return;
 			}
 		}
 		super.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 	
+	@Override
 	public void onGuiClosed() {
 		super.onGuiClosed();
 		mc.getSoundHandler().stopSounds();
 	}
 	
 	public boolean checkTabBounds(CreativeTabs tab) {
-		if (tab != CreativeTabs.tabAllSearch && tab != CreativeTabs.tabInventory) {
+		if (tab != CreativeTabs.SEARCH && tab != CreativeTabs.INVENTORY) {
 			int index = tab.getTabIndex();
 			int page = 0;
 			if (index > 11) {
@@ -104,28 +107,32 @@ public class CreativeTabGui extends GuiContainerCreative {
 		return true;
 	}
 	
+	@Override
 	protected boolean isMouseOverTab(CreativeTabs tab, int x, int y) {
 		return checkTabBounds(tab) && super.isMouseOverTab(tab, x, y);
 	}
 	
+	@Override
 	protected boolean renderCreativeInventoryHoveringText(CreativeTabs tab, int x, int y) {
 		if (isOverNextPage(x, y)) {
-			drawCreativeTabHoveringText(I18n.format("createWorld.customize.custom.next"), x, y);
+			drawHoveringText(I18n.format("createWorld.customize.custom.next"), x, y);
 			return false;
 		}
 		if (isOverPrevPage(x, y)) {
-			drawCreativeTabHoveringText(I18n.format("createWorld.customize.custom.prev"), x, y);
+			drawHoveringText(I18n.format("createWorld.customize.custom.prev"), x, y);
 			return false;
 		}
 		return checkTabBounds(tab) && super.renderCreativeInventoryHoveringText(tab, x, y);
 	}
 	
+	@Override
 	protected void drawTab(CreativeTabs tab) {
 		if (checkTabBounds(tab)) {
 			super.drawTab(tab);
 		}
 	}
 	
+	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		drawScrollButtons(mouseX, mouseY);
 		super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
@@ -179,6 +186,7 @@ public class CreativeTabGui extends GuiContainerCreative {
 		}
 	}
 	
+	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 		drawScrollButtonIcons(mouseX, mouseY);
 		super.drawGuiContainerForegroundLayer(mouseX, mouseY);

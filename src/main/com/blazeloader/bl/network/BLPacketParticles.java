@@ -15,7 +15,7 @@ import io.netty.buffer.ByteBuf;
 public class BLPacketParticles implements IMessageHandler<BLPacketParticles.Message, IMessage, INetHandler> {
 	
 	public IMessage onMessage(Message message, INetHandler net) {
-		ParticlesRegister.instance().handleParticleSpawn(ApiClient.getPlayer().worldObj, message);
+		ParticlesRegister.instance().handleParticleSpawn(ApiClient.getPlayer().getEntityWorld(), message);
 		return null;
 	}
 	
@@ -51,7 +51,7 @@ public class BLPacketParticles implements IMessageHandler<BLPacketParticles.Mess
 	    public void fromBytes(ByteBuf bytes) {
 	    	PacketBuffer buf = new PacketBuffer(bytes);
 	    	
-	        particleType = ParticlesRegister.getParticleFromName(buf.readStringFromBuffer(32767));
+	        particleType = ParticlesRegister.getParticleFromName(buf.readString(32767));
 	        
 	        if (particleType == null) particleType = ParticleType.NONE;
 	        
@@ -66,7 +66,7 @@ public class BLPacketParticles implements IMessageHandler<BLPacketParticles.Mess
 	        particleCount = buf.readInt();
 	        arguments = new int[particleType.getArgumentCount()];
 	        for (int i = 0; i < arguments.length; i++) {
-	            arguments[i] = buf.readVarIntFromBuffer();
+	            arguments[i] = buf.readVarInt();
 	        }
 	    }
 	    
@@ -85,7 +85,7 @@ public class BLPacketParticles implements IMessageHandler<BLPacketParticles.Mess
 	        buf.writeFloat(particleSpeed);
 	        buf.writeInt(particleCount);
 	        for (int i = 0; i < particleType.getArgumentCount(); ++i) {
-	            buf.writeVarIntToBuffer(arguments[i]);
+	            buf.writeVarInt(arguments[i]);
 	        }
 	    }
 

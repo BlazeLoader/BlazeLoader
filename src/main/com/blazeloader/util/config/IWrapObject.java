@@ -7,6 +7,11 @@ package com.blazeloader.util.config;
  */
 public interface IWrapObject<T> extends IStringable<IWrapObject<T>> {
 	
+	@SuppressWarnings("unchecked")
+	public default Class<T> getObjectClass() {
+		return (Class<T>)get().getClass();
+	}
+	
 	/**
 	 * Gets the underlying object
 	 */

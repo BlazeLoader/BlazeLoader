@@ -6,15 +6,19 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraft.world.biome.BiomeGenBase.SpawnListEntry;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biome.SpawnListEntry;
 
 import java.util.Iterator;
 import java.util.List;
 
 import com.blazeloader.api.entity.tracker.EntityTrackerRegistry;
 import com.blazeloader.api.entity.tracker.ITrack;
+import com.blazeloader.api.privileged.PEntityList;
+import com.blazeloader.event.mixin.common.MEntityList;
+import com.blazeloader.event.mixin.common.MTileEntity;
 import com.google.common.collect.Lists;
 
 /**
@@ -32,7 +36,7 @@ public class ApiEntity {
      * @param entityId    The entityId that is used to represent the entity over the network and in saves.
      */
     public static void registerEntityType(Class<? extends Entity> entityClass, String entityName, int entityId) {
-        EntityList.addMapping(entityClass, entityName, entityId);
+        MEntityList.register(entityId, entityName, entityClass, entityName);
     }
     
     /**
@@ -42,8 +46,7 @@ public class ApiEntity {
      * @param name  Entity name. Used as its id.
      */
     public static void registerTileEntity(Class<? extends TileEntity> clazz, String name) {
-        TileEntity.classToNameMap.put(clazz, name);
-        TileEntity.nameToClassMap.put(name, clazz);
+    	MTileEntity.getRegistry().putObject(new ResourceLocation(name), clazz);
     }
     
     /**
@@ -52,8 +55,8 @@ public class ApiEntity {
      * @param entityName The entity name for this egg.
      * @param eggInfo  The EntityEggInfo to register.
      */
-    public static void registerEntityEggInfo(String entityName, EntityList.EntityEggInfo eggInfo) {
-        EntityList.entityEggs.put(entityName, eggInfo);
+    public static void registerEntityEggInfo(String name, int primaryColour, int secondaryColour) {
+        PEntityList.addSpawnInfo(name, primaryColour, secondaryColour);
     }
     
     /**
@@ -85,18 +88,14 @@ public class ApiEntity {
      * @param c Replacement class
      */
     public static void swapEntityClass(Class<? extends EntityLiving> o, Class<? extends EntityLiving> c) {
-        if (EntityList.classToStringMapping.containsKey(o) && EntityList.classToIDMapping.containsKey(c)) {
-            String name = (String) EntityList.classToStringMapping.get(o);
-            int id = (Integer) EntityList.classToIDMapping.get(o);
-
-            EntityList.stringToClassMapping.put(name, c);
-            EntityList.classToStringMapping.put(c, name);
-            EntityList.idToClassMapping.put(id, c);
-            EntityList.classToIDMapping.put(c, id);
-
-            for (EnumCreatureType i : EnumCreatureType.values()) {
-                ApiEntity.swapEntitySpawn(o, c, i);
-            }
+    	ResourceLocation res = EntityList.getKey(o);
+    	
+    	if (res == null) return;
+    	int id = EntityList.REGISTRY.getIDForObject(o);
+    	
+    	EntityList.REGISTRY.register(id, res, c);
+        for (EnumCreatureType i : EnumCreatureType.values()) {
+            ApiEntity.swapEntitySpawn(o, c, i);
         }
     }
 
@@ -108,9 +107,9 @@ public class ApiEntity {
      * @param e CreatureType
      */
     public static void swapEntitySpawn(Class<? extends Entity> o, Class<? extends EntityLiving> c, EnumCreatureType e) {
-    	Iterable<BiomeGenBase> standardBiomes = BiomeGenBase.biomeRegistry;
+    	Iterable<Biome> standardBiomes = Biome.REGISTRY;
     	
-        for (BiomeGenBase biome : standardBiomes) {
+        for (Biome biome : standardBiomes) {
             if (biome != null) {
                 List<SpawnListEntry> spawnableList = biome.getSpawnableList(e);
                 if (spawnableList != null) {
@@ -135,16 +134,16 @@ public class ApiEntity {
      * @param type     Type of spwning to be used by this entity
      * @param biomes   List of biomes this entity should spawn in
      */
-    public static void registerSpawn(Class<? extends EntityLiving> c, int weight, int minGroup, int maxGroup, EnumCreatureType type, BiomeGenBase... biomes) {
-    	Iterable<BiomeGenBase> biomeList = null;
+    public static void registerSpawn(Class<? extends EntityLiving> c, int weight, int minGroup, int maxGroup, EnumCreatureType type, Biome... biomes) {
+    	Iterable<Biome> biomeList = null;
     	
     	if (biomes.length == 0) {
-            biomeList = BiomeGenBase.biomeRegistry;
+            biomeList = Biome.REGISTRY;
         } else {
         	biomeList = Lists.newArrayList(biomes);
         }
         
-        for (BiomeGenBase biome : biomeList) {
+        for (Biome biome : biomeList) {
             if (biome != null) {
                 List<SpawnListEntry> spawnableList = biome.getSpawnableList(type);
                 Iterator<SpawnListEntry> iter = spawnableList.iterator();
@@ -179,7 +178,7 @@ public class ApiEntity {
      * @return Return the ID of the entity
      */
     public static int getEntityID(Entity entity) {
-        return EntityList.getEntityID(entity);
+        return EntityList.REGISTRY.getIDForObject(entity.getClass());
     }
     
     /**
@@ -189,7 +188,7 @@ public class ApiEntity {
      * @return the String ID for the tile entity
      */
     public static String getTileEntityID(TileEntity entity) {
-    	return (String)TileEntity.classToNameMap.get(entity.getClass());
+    	return TileEntity.getKey(entity.getClass()).toString();
     }
 
     /**
@@ -219,7 +218,7 @@ public class ApiEntity {
      * @return Return the type of the entity.
      */
     public static String getEntityTypeFromID(int id) {
-        return EntityList.func_188430_a(EntityList.getClassFromID(id));
+        return EntityList.getTranslationName(EntityList.getKey(EntityList.getClassFromID(id)));
     }
 
     /**
@@ -229,7 +228,7 @@ public class ApiEntity {
      * @return Return then ID of the entity.
      */
     public static int getEntityIDFromType(String type) {
-        return EntityList.getIDFromString(type);
+        return EntityList.REGISTRY.getIDForObject(EntityList.getClassFromName(type));
     }
 
     /**
@@ -262,6 +261,6 @@ public class ApiEntity {
      * @return Return the spawned entity.
      */
     public static Entity createEntityByType(String type, World world) {
-        return EntityList.createEntityByName(type, world);
+        return EntityList.createEntityByIDFromName(new ResourceLocation(type), world);
     }
 }

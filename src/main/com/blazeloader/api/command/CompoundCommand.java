@@ -9,6 +9,7 @@ import com.blazeloader.api.ApiServer;
 
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.ICommand;
+import net.minecraft.command.ICommandManager;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.MinecraftServer;
@@ -17,7 +18,7 @@ import net.minecraft.util.math.BlockPos;
 /**
  * A special type of command that encapsulates a private set of commands and its own /help.
  */
-public abstract class CompoundCommand extends BLCommandBase {
+public abstract class CompoundCommand extends BLCommandBase implements ICommandManager {
 
 	protected final CommandHandler handler = new CommandHandler() {
 		@Override
@@ -36,14 +37,17 @@ public abstract class CompoundCommand extends BLCommandBase {
 		}
 	}
 	
-	public String getCommandName() {
+	@Override
+	public String getName() {
 		return name;
 	}
 	
-	public String getCommandUsage(ICommandSender sender) {
-		return "/" + getCommandName() + " /{command} {argumants}";
+	@Override
+	public String getUsage(ICommandSender sender) {
+		return "/" + getName() + " /{command} {argumants}";
 	}
-
+	
+	@Override
 	public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws WrongUsageException {
 		if (args.length > 0) {
 			String raw = "";
@@ -53,30 +57,31 @@ public abstract class CompoundCommand extends BLCommandBase {
 			}
 			handler.executeCommand(sender, raw);
 		} else {
-			throw new WrongUsageException(getCommandUsage(sender));
+			throw new WrongUsageException(getUsage(sender));
 		}
 	}
 	
-	public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
+	@Override
+	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
     	if (args.length < 2) {
 	    	if (args.length == 0) {
 	    		List<ICommand> commands = handler.getPossibleCommands(sender);
 	    		Collections.sort(commands);
 		    	List<String> result = new ArrayList<String>();
 		    	for (ICommand i : commands) {
-		    		result.add("/" + i.getCommandName());
+		    		result.add("/" + i.getName());
 		    	}
 		        return result;
 	    	} else {
 	    		for (int i = 0; i < args.length; i++) args[i] = args[i].replace("/", "");
-	    		return handler.getTabCompletionOptions(sender, args[0], pos);
+	    		return handler.getTabCompletions(sender, args[0], pos);
 	    	}
 	    	
     	}
     	
 		ICommand command = getCommands().get(args[0].substring(1));
 		if (command != null && command.checkPermission(server, sender)) {
-			return command.getTabCompletionOptions(server, sender, dropFirstString(args), pos);
+			return command.getTabCompletions(server, sender, dropFirstString(args), pos);
 		}
     	return null;
     }
@@ -89,6 +94,7 @@ public abstract class CompoundCommand extends BLCommandBase {
 	 * 
 	 * @return	Number of executions.
 	 */
+	@Override
 	public int executeCommand(ICommandSender sender, String rawCommand) {
 		return handler.executeCommand(sender, rawCommand);
 	}
@@ -98,6 +104,7 @@ public abstract class CompoundCommand extends BLCommandBase {
 	 * @param sender	An entity that can execute commands
 	 * @return	List of possible commands.
 	 */
+	@Override
 	public List<ICommand> getPossibleCommands(ICommandSender sender) {
 		return handler.getPossibleCommands(sender);
 	}
@@ -105,6 +112,7 @@ public abstract class CompoundCommand extends BLCommandBase {
     /**
      * returns a map of string to commads. All commands are returned, not just ones which someone has permission to use.
      */
+	@Override
     public Map<String, ICommand> getCommands() {
         return handler.getCommands();
     }

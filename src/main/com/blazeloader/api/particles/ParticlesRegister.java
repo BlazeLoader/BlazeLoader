@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -35,7 +34,7 @@ import com.blazeloader.util.version.Versions;
  *
  */
 public class ParticlesRegister<T> {
-	private static ParticlesRegister instance;
+	protected static ParticlesRegister<?> instance;
 	
 	protected static final HashMap<String, IParticle> particleNames = new HashMap<String, IParticle>();
 	protected static final HashMap<Integer, IParticle> particleIds = new HashMap<Integer, IParticle>();
@@ -48,14 +47,15 @@ public class ParticlesRegister<T> {
 		instance = this;
 	}
 
-	public static ParticlesRegister instance() {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static <F> ParticlesRegister<F> instance() {
 		if (instance == null) {
 			if (Versions.isClient()) {
-				return new ParticlesRegisterClient();
+				return (ParticlesRegister<F>)new ParticlesRegisterClient();
 			}
-			return new ParticlesRegister();
+			return (ParticlesRegister<F>)new ParticlesRegister();
 		}
-		return instance;
+		return (ParticlesRegister<F>)instance;
 	}
 	
 	public static String[] getParticleNames() {
@@ -89,10 +89,9 @@ public class ParticlesRegister<T> {
 		for (EnumParticleTypes i : EnumParticleTypes.values()) {
 			if (!particleNames.containsKey(i.getParticleName())) particleNames.put(i.getParticleName(), getParticle(i));
 		}
-		Set<Integer> registeredIds = EnumParticleTypes.PARTICLES.keySet();
 		Iterator<IParticle> types = particlesRegistry.iterator();
 		for (int i = 0; types.hasNext();) {
-			if (registeredIds.contains(i)) {
+			if (EnumParticleTypes.getParticleFromId(i) != null) {
 				i++;
 			} else {
 				IParticle type = types.next();
@@ -104,8 +103,7 @@ public class ParticlesRegister<T> {
 		}
 	}
 	
-	public Map<Integer, T> init(Map<Integer, T> mappings) {
-		return mappings;
+	public void init(Map<Integer, T> mappings) {
 	}
 		
 	public IParticle registerParticle(String name, boolean ignoreDistance, int argumentCount) {
@@ -138,9 +136,9 @@ public class ParticlesRegister<T> {
     public void addBlockHitEffectsToEntity(Entity e, IBlockState blockState, int side) {
     	side = side % 6;
     	float f = 0.25f;
-    	double x = MathHelper.getRandomDoubleInRange(e.worldObj.rand, e.posX - e.width/2 - f, e.posX + e.width/2 + f);
-    	double y = MathHelper.getRandomDoubleInRange(e.worldObj.rand, e.posY - f, e.posY + e.height + f);
-    	double z = MathHelper.getRandomDoubleInRange(e.worldObj.rand, e.posZ - e.width/2 - f, e.posZ + e.width/2 + f);
+    	double x = MathHelper.nextDouble(e.getEntityWorld().rand, e.posX - e.width/2 - f, e.posX + e.width/2 + f);
+    	double y = MathHelper.nextDouble(e.getEntityWorld().rand, e.posY - f, e.posY + e.height + f);
+    	double z = MathHelper.nextDouble(e.getEntityWorld().rand, e.posZ - e.width/2 - f, e.posZ + e.width/2 + f);
     	
     	double vX = 0;
     	double vY = 0;
@@ -167,17 +165,17 @@ public class ParticlesRegister<T> {
         	x = e.posX + e.width/2 + f;
         	vX += 0.5;
         }
-        spawnDigginFX(e.worldObj, x, y, z, vX, vY, vZ, blockState, 0.2F, 0.6F);
+        spawnDigginFX(e.getEntityWorld(), x, y, z, vX, vY, vZ, blockState, 0.2F, 0.6F);
     }
     
     public void addBlockDestroyEffectsToEntity(Entity e, IBlockState blockState) {
     	float f = 0.1f;
     	int total = 64 * (int)(e.width * e.height * e.width);
     	for (int i = 0; i < total; i++) {
-	    	double x = MathHelper.getRandomDoubleInRange(e.worldObj.rand, e.posX - e.width/2 - f, e.posX + e.width/2 + f);
-	    	double y = MathHelper.getRandomDoubleInRange(e.worldObj.rand, e.posY - f, e.posY + e.height + f);
-	    	double z = MathHelper.getRandomDoubleInRange(e.worldObj.rand, e.posZ - e.width/2 - f, e.posZ + e.width/2 + f);
-	    	spawnDigginFX(e.worldObj, x, y, z, x - (int)x - 0.5, y - (int)y - 0.5, z - (int)z - 0.5, blockState, 1, 1);
+	    	double x = MathHelper.nextDouble(e.getEntityWorld().rand, e.posX - e.width/2 - f, e.posX + e.width/2 + f);
+	    	double y = MathHelper.nextDouble(e.getEntityWorld().rand, e.posY - f, e.posY + e.height + f);
+	    	double z = MathHelper.nextDouble(e.getEntityWorld().rand, e.posZ - e.width/2 - f, e.posZ + e.width/2 + f);
+	    	spawnDigginFX(e.getEntityWorld(), x, y, z, x - (int)x - 0.5, y - (int)y - 0.5, z - (int)z - 0.5, blockState, 1, 1);
     	}
     }
 	
@@ -185,7 +183,7 @@ public class ParticlesRegister<T> {
 		total *= shape.getVolumeOfSpawnableSpace();
 		for (int i = 0; i < total; i++) {
 			Vec3d point = shape.computePoint(world.rand);
-			spawnParticle(particle.setPos(x + shape.getXOffset() + point.xCoord, y + shape.getYOffset() + point.yCoord, z + shape.getZOffset() + point.zCoord), world);
+			spawnParticle(particle.setPos(x + shape.getXOffset() + point.x, y + shape.getYOffset() + point.y, z + shape.getZOffset() + point.z), world);
 		}
 	}
 	
@@ -196,13 +194,14 @@ public class ParticlesRegister<T> {
 	
     public void spawnParticle(ParticleData particle, World world) {
     	if (particle.getType() == ParticleType.NONE) return;
-    	if (EnumParticleTypes.PARTICLES.containsKey(particle.getType().getId())) {
-    		Packet packet = new SPacketParticles(EnumParticleTypes.getParticleFromId(particle.getType().getId()), particle.getIgnoreDistance(), (float)particle.posX, (float)particle.posY, (float)particle.posZ, 0, 0, 0, (float)particle.getVel().lengthVector(), 1, particle.getArgs());
+    	EnumParticleTypes vanillaP = EnumParticleTypes.getParticleFromId(particle.getType().getId());
+    	if (vanillaP != null) {
+    		Packet<?> packet = new SPacketParticles(vanillaP, particle.getIgnoreDistance(), (float)particle.posX, (float)particle.posY, (float)particle.posZ, 0, 0, 0, (float)particle.getVel().lengthVector(), 1, particle.getArgs());
 	        for (EntityPlayer player : (ArrayList<EntityPlayer>)(((WorldServer)world).playerEntities)) {
 	            BlockPos pos = player.getPosition();
 	            double dist = pos.distanceSq(particle.posX, particle.posY, particle.posZ);
 	            if (dist <= particle.getMaxRenderDistance() || particle.getIgnoreDistance() && dist <= 65536.0D) {
-	                ((EntityPlayerMP)player).playerNetServerHandler.sendPacket(packet);
+	                ((EntityPlayerMP)player).connection.sendPacket(packet);
 	            }
 	        }
     	} else {

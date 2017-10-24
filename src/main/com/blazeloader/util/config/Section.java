@@ -1,7 +1,7 @@
 package com.blazeloader.util.config;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -9,7 +9,7 @@ import java.util.List;
  * 
  */
 public class Section implements IPropertyGroup {
-	private final HashMap<String, Prop> properties = new HashMap<String, Prop>();
+	private final HashMap<String, Prop<?>> properties = new HashMap<String, Prop<?>>();
 	
 	private final IConfig cfg;
 	
@@ -25,7 +25,8 @@ public class Section implements IPropertyGroup {
 		sectionName = first.substring(0, first.length() - 2);
 		do {
 			try {
-				Prop next = new Prop(cfg, lines);
+				@SuppressWarnings({ "unchecked", "rawtypes" })
+				Prop<?> next = new Prop(cfg, lines);
 				if (next.loaded) {
 					properties.put(next.getName(), next);
 				}
@@ -52,10 +53,12 @@ public class Section implements IPropertyGroup {
 		}
 	}
 	
+	@Override
 	public String getName() {
 		return sectionName;
 	}
 	
+	@Override
 	public void setDescription(String desc) {
 		if (desc == null) {
 			description = "";
@@ -64,13 +67,16 @@ public class Section implements IPropertyGroup {
 		}
 	}
 	
+	@Override
 	public boolean has(String key) {
 		return properties.containsKey(key);
 	}
 	
+	@Override
 	public <T> Prop<T> get(String key, T def) {
 		if (has(key)) {
-			Prop<T> result = properties.get(key);
+			@SuppressWarnings("unchecked")
+			Prop<T> result = (Prop<T>)properties.get(key);
 			if (!def.getClass().isAssignableFrom(result.getTypeClass())) {
 				result.updateType(def);
 			}
@@ -93,14 +99,16 @@ public class Section implements IPropertyGroup {
 		}
 		builder.append(sectionName);
 		builder.append(" {\r\n");
-		for (Prop i : properties.values()) {
+		for (Prop<?> i : values()) {
 			i.writeTo(builder);
 			builder.append("\r\n");
 		}
 		builder.append("}");
 	}
 	
-	public Iterator<IProperty> iterator() {
-		return (Iterator<IProperty>)(Object)properties.values().iterator();
+	@Override
+	@SuppressWarnings("unchecked")
+	public Collection<Prop<?>> values() {
+		return (Collection<Prop<?>>) properties.values();
 	}
 }

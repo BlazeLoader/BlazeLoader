@@ -24,8 +24,8 @@ import net.minecraft.network.play.server.SPacketCustomPayload;
  */
 public class PacketChannel {
 	
-	private final Map<Integer, PacketEntry> server_mapping = new HashMap<Integer, PacketEntry>();
-	private final Map<Integer, PacketEntry> client_mapping = new HashMap<Integer, PacketEntry>();
+	private final Map<Integer, PacketEntry<?>> server_mapping = new HashMap<Integer, PacketEntry<?>>();
+	private final Map<Integer, PacketEntry<?>> client_mapping = new HashMap<Integer, PacketEntry<?>>();
 	
 	private final Map<Class<? extends IMessage>, Integer> server_packetClasses = new HashMap<Class<? extends IMessage>, Integer>();
 	private final Map<Class<? extends IMessage>, Integer> client_packetClasses = new HashMap<Class<? extends IMessage>, Integer>();
@@ -48,7 +48,7 @@ public class PacketChannel {
 			if (channelName.contentEquals(channel)) {
 				int id = data.readInt();
 				if (client_mapping.containsKey(id)) {
-					INetHandler net = ApiClient.getClient().getNetHandler();
+					INetHandler net = ApiClient.getClient().getConnection();
 					IMessage responce = client_mapping.get(id).onPacketRecieved(net, data);
 					if (responce != null) {
 						sendToServer(responce);
@@ -72,7 +72,7 @@ public class PacketChannel {
 			if (channelName.contentEquals(channel)) {
 				int id = data.readInt();
 				if (server_mapping.containsKey(id)) {
-					IMessage responce = server_mapping.get(id).onPacketRecieved(sender.playerNetServerHandler, data);
+					IMessage responce = server_mapping.get(id).onPacketRecieved(sender.connection, data);
 					if (responce != null) {
 						sendToClient(responce, sender);
 					}
@@ -91,6 +91,7 @@ public class PacketChannel {
 	 * @param messageClass	Type of message it receives
 	 * @param packetId		Id for the packets it receives
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <T extends IMessage> void registerMessageHandler(Side handlerSide, IMessageHandler<T, ?, ?> handler, Class<T> messageClass, int packetId) {
 		new PacketEntry(handlerSide, handler, messageClass, packetId);
 	}
@@ -162,7 +163,7 @@ public class PacketChannel {
 	 * 
 	 * @return	A Packet with the given data that once, received on the opposite side, will be brought back to be handled by this PacketChannel.
 	 */
-	public Packet getRawPacket(IMessage message) {
+	public Packet<?> getRawPacket(IMessage message) {
 		PacketBuffer data = getRawData(message);
         return new SPacketCustomPayload(channelName, data);
 	}

@@ -1,12 +1,23 @@
 package com.blazeloader.api.recipe;
 
-import com.google.common.collect.Lists;
+import com.blazeloader.util.registry.ObjectRegistry;
+import com.blazeloader.util.resources.ResourceDirectoryWalker;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
+
 import net.minecraft.block.Block;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.item.crafting.ShapedRecipes;
+import net.minecraft.item.crafting.ShapelessRecipes;
+import net.minecraft.util.JsonUtils;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.RegistryNamespaced;
 import net.minecraft.world.World;
 
 import java.util.*;
@@ -17,7 +28,7 @@ public class ApiCrafting {
 	private static int nextId = 1;
 	
 	static {
-		instances.put(0, new BLCraftingManager(0, CraftingManager.getInstance().getRecipeList()));
+		instances.put(0, new BLCraftingManager(0, CraftingManager.REGISTRY));
 	}
 	
 	/**
@@ -26,26 +37,6 @@ public class ApiCrafting {
 	 */
 	public static ICraftingManager getVanillaCraftingManager() {
 		return instances.get(0);
-	}
-	
-	/**
-	 * Intended for compatibility with mods that implemement their
-	 * own CraftingManagers based off of the vanilla one.
-	 * 
-	 * Will parse a vanilla Minecraft CraftingManager to a Blazeloader apis compatible Manager.
-	 * 
-	 * It is not recommended to use this method often. Rather start off with a Manager
-	 * or keep a reference to the converted result for later use.
-	 * 
-	 * @param manager	CraftingManager to convert
-	 * 
-	 * @return Manager corresponding to the given CraftingManager
-	 */
-	public static ICraftingManager toManager(CraftingManager manager) {
-		for (ICraftingManager i : instances.values()) {
-			if (i.equals(manager)) return i;
-		}
-		return createCraftingManager((ArrayList<IRecipe>)manager.getRecipeList());
 	}
 	
 	/**
@@ -63,10 +54,10 @@ public class ApiCrafting {
 	 * Creates a brand spanking **new** Crafting Manager.
 	 */
 	public static ICraftingManager createCraftingManager() {
-		return createCraftingManager(new ArrayList<IRecipe>());
+		return createCraftingManager(ObjectRegistry.createNamespacedRegistry());
 	}
-
-	private static ICraftingManager createCraftingManager(ArrayList<IRecipe> startingRecipes) {
+	
+	private static ICraftingManager createCraftingManager(RegistryNamespaced<ResourceLocation, IRecipe> startingRecipes) {
 		int id = nextId++;
 		instances.put(id, new BLCraftingManager(id, startingRecipes));
 		return instances.get(id);
@@ -74,9 +65,11 @@ public class ApiCrafting {
 	
 	public static final class BLCraftingManager implements ICraftingManager {
 		private final int id;
-		private final List<IRecipe> recipes;
-
-		private BLCraftingManager(int n, List<IRecipe> recipes) {
+		private final RegistryNamespaced<ResourceLocation, IRecipe> recipes;
+		private int nextRecipeId = 0;
+		
+		
+		private BLCraftingManager(int n, RegistryNamespaced<ResourceLocation, IRecipe> recipes) {
 			id = n;
 			this.recipes = recipes;
 		}
@@ -85,40 +78,36 @@ public class ApiCrafting {
 			return id;
 		}
 		
-		public List<IRecipe> getRecipeList() {
-			return Collections.unmodifiableList(recipes);
-		}
-		
-	    public ShapedRecipe addRecipe(ItemStack output, Object... input) {
-	    	ShapedRecipe result = createShaped(output, false, input);
-	        recipes.add(result);
+	    public ShapedRecipe addRecipe(ResourceLocation name, ItemStack output, Object... input) {
+	    	ShapedRecipe result = createShaped(name.toString(), output, false, input);
+	    	addRecipe(name, result);
 	        return result;
 	    }
 	    
-	    public ShapelessRecipe addShapelessRecipe(ItemStack output, Object... input) {
-	    	ShapelessRecipe result = createShapeless(output, false, input);
-	        recipes.add(result);
+	    public ShapelessRecipe addShapelessRecipe(ResourceLocation name, ItemStack output, Object... input) {
+	    	ShapelessRecipe result = createShapeless(name.toString(), output, false, input);
+	    	addRecipe(name, result);
 	        return result;
 	    }
 	    
-	    public ReversibleShapedRecipe addReverseRecipe(ItemStack output, Object... input) {
-	    	ShapedRecipe result = createShaped(output, true, input);
-	        recipes.add(result);
+	    public ReversibleShapedRecipe addReverseRecipe(ResourceLocation name, ItemStack output, Object... input) {
+	    	ShapedRecipe result = createShaped(name.toString(), output, true, input);
+	    	addRecipe(name, result);
 	        return (ReversibleShapedRecipe)result;
 	    }
 	    
-	    public ReversibleShapelessRecipe addReverseShapelessRecipe(ItemStack output, Object... input) {
-	    	ShapelessRecipe result = createShapeless(output, true, input);
-	        recipes.add(result);
+	    public ReversibleShapelessRecipe addReverseShapelessRecipe(ResourceLocation name, ItemStack output, Object... input) {
+	    	ShapelessRecipe result = createShapeless(name.toString(), output, true, input);
+	    	addRecipe(name, result);
 	        return (ReversibleShapelessRecipe)result;
 	    }
 	    
-	    public void addRecipe(IRecipe recipe) {
-	        recipes.add(recipe);
+	    public void addRecipe(ResourceLocation name, IRecipe recipe) {
+	    	recipes.register(nextRecipeId++, name, recipe);
 	    }
 	    
 	    public boolean removeRecipe(IRecipe recipe) {
-	    	return recipes.remove(recipe);
+	    	return ObjectRegistry.of(recipes).removeObjectFromRegistry(recipes.getNameForObject(recipe)) != null;
 	    }
 	    
 	    public int removeRecipe(ItemStack result) {
@@ -127,17 +116,17 @@ public class ApiCrafting {
 	    
 	    public int removeRecipe(ItemStack result, int maxRemovals) {
 	    	int count = 0;
-	    	for (int i = 0; i < recipes.size(); i++) {
-	    		if (recipes.get(i).getRecipeOutput() == result) {
+	    	for (IRecipe i : recipes) {
+	    		if (i.getRecipeOutput() == result) {
 	    			count++;
-	    			recipes.remove(i);
+	    			ObjectRegistry.of(recipes).removeObjectFromRegistry(recipes.getNameForObject(i));
 	    			if (maxRemovals > 0 && count >= maxRemovals) return count;
 	    		}
 	    	}
 	    	return count;
 	    }
 	    
-	    private ShapedRecipe createShaped(ItemStack output, boolean reverse, Object... input) {
+	    private ShapedRecipe createShaped(String group, ItemStack output, boolean reverse, Object... input) {
 	        String recipe = "";
 	        int index = 0;
 	        int width = 0;
@@ -173,34 +162,33 @@ public class ApiCrafting {
 	            index += 2;
 	        }
 
-	        ItemStack[] stacks = new ItemStack[width * height];
+	        Ingredient[] stacks = new Ingredient[width * height];
 	        for (int i = 0; i < width * height; i++) {
 	            char key = recipe.charAt(i);
 	            if (stackmap.containsKey(key)) {
-	                stacks[i] = stackmap.get(key).copy();
-	            } else {
-	                stacks[i] = null;
+	                stacks[i] = Ingredient.fromStacks(stackmap.get(key).copy());
 	            }
 	        }
-	        if (reverse) return new ReversibleShapedRecipe(width, height, stacks, output);
-	        return new ShapedRecipe(width, height, stacks, output);
+	        NonNullList<Ingredient> ingredients = NonNullList.from(Ingredient.EMPTY, stacks);
+	        if (reverse) return new ReversibleShapedRecipe(group, width, height, ingredients, output);
+	        return new ShapedRecipe(group, width, height, ingredients, output);
 	    }
 	    
-	    private ShapelessRecipe createShapeless(ItemStack output, boolean reverse, Object ... input) {
-	        ArrayList itemStacks = Lists.newArrayList();
+	    private ShapelessRecipe createShapeless(String group, ItemStack output, boolean reverse, Object ... input) {
+	    	NonNullList<Ingredient> ingredients = NonNullList.from(Ingredient.EMPTY);
 			for (Object obj : input) {
 				if (obj instanceof ItemStack) {
-					itemStacks.add(((ItemStack) obj).copy());
+					ingredients.add(Ingredient.fromStacks(((ItemStack) obj).copy()));
 				} else if (obj instanceof Item) {
-					itemStacks.add(new ItemStack((Item) obj));
+					ingredients.add(Ingredient.fromItem((Item)obj));
 				} else {
 					if (!(obj instanceof Block))
 						throw new IllegalArgumentException("Invalid shapeless recipe: unknown type " + obj.getClass().getName() + "!");
-					itemStacks.add(new ItemStack((Block) obj));
+					ingredients.add(Ingredient.fromStacks(new ItemStack((Block) obj)));
 				}
 			}
-			if (reverse) return new ReversibleShapelessRecipe(output, itemStacks);
-	        return new ShapelessRecipe(output, itemStacks);
+			if (reverse) return new ReversibleShapelessRecipe(group, output, ingredients);
+	        return new ShapelessRecipe(group, output, ingredients);
 	    }
 	    
 	    public ItemStack findMatchingRecipe(InventoryCrafting inventory, World world) {
@@ -210,7 +198,7 @@ public class ApiCrafting {
 	        return null;
 	    }
 	    
-	    public ItemStack[] findRecipeInput(ItemStack recipeOutput, int width, int height) {
+	    public NonNullList<Ingredient> findRecipeInput(ItemStack recipeOutput, int width, int height) {
 	    	for (IRecipe i : recipes) {
 	    		if (i instanceof IReversibleRecipe) {
 	    			IReversibleRecipe recipe = ((IReversibleRecipe)i);
@@ -220,7 +208,8 @@ public class ApiCrafting {
 	    	return null;
 	    }
 	    
-	    public ItemStack[] getUnmatchedInventory(InventoryCrafting inventory, World world) {
+	    @Override
+	    public NonNullList<ItemStack> getUnmatchedInventory(InventoryCrafting inventory, World world) {
 	        for (IRecipe i : recipes) {
 	            if (i.matches(inventory, world)) return i.getRemainingItems(inventory);
 	        }
@@ -228,20 +217,37 @@ public class ApiCrafting {
 	        for (int i = 0; i < newInventory.length; i++) {
 	            newInventory[i] = inventory.getStackInSlot(i);
 	        }
-	        return newInventory;
+	        return NonNullList.from(null, newInventory);
 	    }
 	    
 	    public boolean equals(Object obj) {
 			if (obj instanceof ICraftingManager) {
-				return ((ICraftingManager) obj).getId() == id;
+				return ((ICraftingManager) obj).getId() == getId();
 			}
 	    	if (obj instanceof CraftingManager) {
-	    		return recipes.equals(((CraftingManager)obj).getRecipeList());
+	    		return recipes.equals(CraftingManager.REGISTRY);
 	    	}
-	    	if (obj instanceof List<?>) {
+	    	if (obj instanceof RegistryNamespaced<?, ?>) {
 	    		return obj.equals(recipes);
 	    	}
 	    	return super.equals(obj);
 	    }
+
+		@Override
+		public void loadRecipesFromJSON(String path) {
+			(new ResourceDirectoryWalker() {
+				public void parseJSONEntry(ResourceLocation name, JsonObject jsonObject) {
+					String s = JsonUtils.getString(jsonObject, "type");
+
+			        if ("crafting_shaped".equals(s)) {
+			        	addRecipe(name, ShapedRecipes.deserialize(jsonObject));
+			        } else if ("crafting_shapeless".equals(s)) {
+			        	addRecipe(name, ShapelessRecipes.deserialize(jsonObject));
+			        } else {
+			            throw new JsonSyntaxException("Invalid or unsupported recipe type '" + s + "'");
+			        }
+				}
+			}).tryWalk(path);
+		}
 	}
 }

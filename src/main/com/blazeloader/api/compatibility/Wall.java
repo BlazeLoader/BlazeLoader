@@ -6,8 +6,8 @@ import java.util.*;
 /**
  * A wall for mods to communicate between each other by setting and getting values by a string identifier.
  */
-public final class Wall implements Iterable<Wall.Entry> {
-    private static Map<String, Wall.Entry> wallMap = new HashMap<String, Wall.Entry>();
+public final class Wall implements Iterable<Wall.Entry<?>> {
+    private static Map<String, Wall.Entry<?>> wallMap = new HashMap<String, Wall.Entry<?>>();
     
     private static final Wall instance = new Wall();
     
@@ -42,12 +42,13 @@ public final class Wall implements Iterable<Wall.Entry> {
      * @param name		The name of the item to get.
      * @param value The value to set the item to.
      */
-    public static <T> void setItem(String name, T value) {
+    @SuppressWarnings("unchecked")
+	public static <T> void setItem(String name, T value) {
     	if (value == null) throw new IllegalArgumentException("value cannot be null");
     	if (isDefined(name)) {
-    		wallMap.get(name).setValue(value);
+    		((Wall.Entry<T>)wallMap.get(name)).setValue(value);
     	} else {
-			wallMap.put(name, new Wall.Entry(name, value));
+			wallMap.put(name, new Wall.Entry<T>(name, value));
     	}
     }
 
@@ -83,7 +84,7 @@ public final class Wall implements Iterable<Wall.Entry> {
      * 
      * @return true if the handler is subscribed.
      */
-    public static boolean isSubscribedTo(String name, ISubscription subscriptionObject) {
+    public static boolean isSubscribedTo(String name, ISubscription<?> subscriptionObject) {
     	return isDefined(name) && wallMap.get(name).isSubscribed(subscriptionObject);
     }
     
@@ -96,9 +97,10 @@ public final class Wall implements Iterable<Wall.Entry> {
      * 
      * @return WallItem for the subscribed item
      */
-    public static <T> WallItem<T> subscripteTo(String name, T defaultValue, ISubscription<T> subscriptionObject) {
-    	WallItem result = watchItem(name, defaultValue);
-    	wallMap.get(name).subscribe(subscriptionObject);
+    @SuppressWarnings("unchecked")
+	public static <T> WallItem<T> subscribeTo(String name, T defaultValue, ISubscription<T> subscriptionObject) {
+    	WallItem<T> result = watchItem(name, defaultValue);
+    	((Wall.Entry<T>)wallMap.get(name)).subscribe(subscriptionObject);
     	return result;
     }
     
@@ -108,9 +110,10 @@ public final class Wall implements Iterable<Wall.Entry> {
      * @param name					Name of the item
      * @param subscriptionObject	Handler previously registered to the item
      */
-    public static void unsubscripteFrom(String name, ISubscription subscriptionObject) {
+    @SuppressWarnings("unchecked")
+	public static <T> void unsubscribeFrom(String name, ISubscription<T> subscriptionObject) {
     	if (isDefined(name)) {
-    		wallMap.get(name).unsubscribe(subscriptionObject);
+    		((Wall.Entry<T>)wallMap.get(name)).unsubscribe(subscriptionObject);
     	}
     }
     
@@ -124,11 +127,12 @@ public final class Wall implements Iterable<Wall.Entry> {
      * 
      * @return	WallItem for the requested item
      */
-    public static <T> WallItem<T> watchItem(String name, T defaultValue) {
+    @SuppressWarnings("unchecked")
+	public static <T> WallItem<T> watchItem(String name, T defaultValue) {
     	if (!isDefined(name)) {
     		setItem(name, defaultValue);
     	}
-    	return new WallItem<T>(wallMap.get(name));
+    	return new WallItem<T>((Wall.Entry<T>)wallMap.get(name));
     }
     
     
@@ -165,7 +169,7 @@ public final class Wall implements Iterable<Wall.Entry> {
 	 * @return an iterator over the items on this wall.
 	 */
 	@Override
-	public Iterator<Wall.Entry> iterator() {
+	public Iterator<Wall.Entry<?>> iterator() {
 		return new EntryIterator();
 	}
 	
@@ -173,7 +177,7 @@ public final class Wall implements Iterable<Wall.Entry> {
 	 * Returns an iterator over the values on this Wall.
 	 * @return an iterator over the value on this wall.
 	 */
-	public Iterator valueIterator() {
+	public Iterator<?> valueIterator() {
 		return new ValueIterator();
 	}
 	
@@ -189,12 +193,13 @@ public final class Wall implements Iterable<Wall.Entry> {
     public static class Entry<T> implements Map.Entry<String, T> {
     	private List<ISubscription<T>> watchers = new ArrayList<ISubscription<T>>(); 
     	private T value;
-    	private final Class clazz;
+    	private final Class<T> clazz;
     	private final String key;
     	
-    	public Entry(String name, T val) {
+    	@SuppressWarnings("unchecked")
+		public Entry(String name, T val) {
     		value = val;
-			clazz = val.getClass();
+			clazz = (Class<T>)val.getClass();
     		key = name;
     	}
     	
@@ -204,7 +209,7 @@ public final class Wall implements Iterable<Wall.Entry> {
 					throw new TypeConstraintException("New value must be of the same type as the field \"" + key + "\". " + val.getClass().toString() + " cannot be cast to " + clazz.toString());
 	    		}
 	    		boolean write = true;
-	    		for (ISubscription i : watchers) {
+	    		for (ISubscription<T> i : watchers) {
 	    			write &= i.valueChanged(key, value, val);
 	    		}
 	    		if (write) value = val;
@@ -234,7 +239,7 @@ public final class Wall implements Iterable<Wall.Entry> {
 			return val == null || clazz.isAssignableFrom(val.getClass());
 		}
     	
-    	private boolean isSubscribed(ISubscription<T> subscriptionObject) {
+    	private boolean isSubscribed(ISubscription<?> subscriptionObject) {
     		return watchers.contains(subscriptionObject);
     	}
     	
@@ -252,7 +257,7 @@ public final class Wall implements Iterable<Wall.Entry> {
     }
     
 	private final class ValueIterator implements Iterator<Object> {
-		private final Iterator<Wall.Entry> mappingsIter = wallMap.values().iterator();
+		private final Iterator<Wall.Entry<?>> mappingsIter = wallMap.values().iterator();
 		
 		@Override
 		public boolean hasNext() {
@@ -268,8 +273,8 @@ public final class Wall implements Iterable<Wall.Entry> {
 		public void remove() {}
 	}
 	
-	private final class EntryIterator implements Iterator<Wall.Entry> {
-		private final Iterator<Map.Entry<String, Wall.Entry>> mappingsIter = wallMap.entrySet().iterator();
+	private final class EntryIterator implements Iterator<Wall.Entry<?>> {
+		private final Iterator<Map.Entry<String, Wall.Entry<?>>> mappingsIter = wallMap.entrySet().iterator();
 		
 		@Override
 		public boolean hasNext() {
@@ -277,7 +282,7 @@ public final class Wall implements Iterable<Wall.Entry> {
 		}
 
 		@Override
-		public Wall.Entry next() {
+		public Wall.Entry<?> next() {
 			return mappingsIter.next().getValue();
 		}
 

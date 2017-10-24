@@ -13,5 +13,5 @@ public interface INBTWritable {
 	 * 
 	 * @param tagCompound
 	 */
-	public void readFromNBT(NBTTagCompound tagCompound);
+	public INBTWritable readFromNBT(NBTTagCompound tagCompound);
 }

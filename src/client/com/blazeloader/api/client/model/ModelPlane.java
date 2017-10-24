@@ -1,7 +1,10 @@
 package com.blazeloader.api.client.model;
 
+import com.blazeloader.event.mixin.client.MVertexBuffer;
+
 import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.model.TexturedQuad;
+import net.minecraft.client.renderer.BufferBuilder;
 
 public class ModelPlane extends ModelUVMappedBox {
 	
@@ -30,11 +33,11 @@ public class ModelPlane extends ModelUVMappedBox {
     	return this;
     }
     
-    public void render(VertexBuffer renderer, float scale) {
+    @Override
+    public void render(BufferBuilder renderer, float scale) {
+    	TexturedQuad[] quadList = ((MVertexBuffer)(Object)this).getQuadList();
         for (int i = 0; i < quadList.length; i++) {
-        	if (!sidesHidden[i]) {
-        		quadList[i].draw(renderer, scale);
-        	}
+        	if (!sidesHidden[i]) quadList[i].draw(renderer, scale);
         }
     }
 }

@@ -30,12 +30,12 @@ public class WallItem<T> implements IUnwatchable<T> {
 		item.setValue(value);
 	}
 	
-	public WallItem watch(ISubscription<T> subscriptionObject) {
+	public WallItem<T> watch(ISubscription<T> subscriptionObject) {
 		item.subscribe(subscriptionObject);
 		return this;
 	}
 	
-	public WallItem unwatch(ISubscription<T> subscriptionObject) {
+	public WallItem<T> unwatch(ISubscription<T> subscriptionObject) {
 		item.unsubscribe(subscriptionObject);
 		return this;
 	}

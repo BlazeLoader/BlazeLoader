@@ -28,11 +28,12 @@ public class BLMainClient extends BLMain {
     protected boolean initiateShutdown() {
     	Minecraft minecraft = Minecraft.getMinecraft();
     	if (minecraft == null) return false;
-    	LOGGER_FULL.logFatal("Shutting down client...");
+    	LOGGER_FULL.fatal("Shutting down client...");
     	minecraft.shutdown();
     	return true;
     }
     
+    @Override
     public List<InterfaceProvider> getInterfaceProviders() {
     	return Collections.singletonList(new BlazeLoaderInterfaceProviderClient());
     }

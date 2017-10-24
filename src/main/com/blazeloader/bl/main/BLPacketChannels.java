@@ -11,13 +11,10 @@ import com.blazeloader.api.network.Side;
 import com.blazeloader.bl.network.BLPacketParticles;
 import com.blazeloader.bl.network.BLPacketSpawnObject;
 import com.blazeloader.event.listeners.PacketChannelListener;
-import com.blazeloader.util.reflect.Reflect;
-import com.blazeloader.util.reflect.SimpleFunc;
+import com.blazeloader.event.mixin.common.MPluginChannels;
 import com.blazeloader.util.version.Versions;
 import com.google.common.collect.ImmutableList;
-import com.mumfrey.liteloader.core.CommonPluginChannelListener;
 import com.mumfrey.liteloader.core.LiteLoader;
-import com.mumfrey.liteloader.core.PluginChannels;
 
 public class BLPacketChannels extends PacketChannel implements PacketChannelListener {
 	private static final BLPacketChannels instance = new BLPacketChannels();
@@ -68,19 +65,13 @@ public class BLPacketChannels extends PacketChannel implements PacketChannelList
 	/**
 	 * Hack to get Blazeloader PluginChannels registered without having to make a Litemod.
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void register() {
-		BLMain.LOGGER_MAIN.logInfo("Registering Blazeloader packet channel...");
-		SimpleFunc<PluginChannels, Void> addPluginChannelListener = Reflect.lookupMethod(PluginChannels.class, Void.class, "addPluginChannelListener", CommonPluginChannelListener.class);
-		if (addPluginChannelListener.valid()) {
-			try {
-				addPluginChannelListener.apply(LiteLoader.getServerPluginChannels(), this);
-				if (Versions.isClient()) {
-					addPluginChannelListener.apply(LiteLoader.getClientPluginChannels(), this);
-				}
-				BLMain.LOGGER_MAIN.logInfo("Packet channel registration complete.");
-			} catch (Throwable e) {
-				BLMain.LOGGER_MAIN.logError("Exception whilst registering BL packet channel!", e);
-			}
+		BLMain.LOGGER_FULL.info("Registering Blazeloader packet channel...");
+		((MPluginChannels)LiteLoader.getServerPluginChannels()).addPluginChannelListener(this);
+		if (Versions.isClient()) {
+			((MPluginChannels)LiteLoader.getClientPluginChannels()).addPluginChannelListener(this);
 		}
+		BLMain.LOGGER_FULL.debug("Packet channel registration complete.");
 	}
 }

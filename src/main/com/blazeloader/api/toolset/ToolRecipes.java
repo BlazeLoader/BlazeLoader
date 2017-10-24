@@ -3,7 +3,7 @@ package com.blazeloader.api.toolset;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.RecipesTools;
+import net.minecraft.util.ResourceLocation;
 
 import java.util.List;
 
@@ -12,21 +12,26 @@ import com.blazeloader.api.recipe.ICraftingManager;
 import com.google.common.collect.Lists;
 
 /**
- * Factory class for generating recipes for a full se of tools.
+ * Factory class for generating recipes for a full set of tools.
  */
 public class ToolRecipes {
-    private final List<String[]> patterns = Lists.newArrayList(new RecipesTools().recipePatterns);
+    private final List<String[]> patterns = Lists.newArrayList(new String[][] {
+    	{"XXX", " # ", " # "},
+    	{"X", "#", "#"},
+    	{"XX", "X#", " #"},
+    	{"XX", " #", " #"}
+	});
     
     private final ICraftingManager manager;
 	
-    private Item stickMaterial = Items.stick;
+    private Item stickMaterial = Items.STICK;
     
     public ToolRecipes() {
         this(ApiCrafting.getVanillaCraftingManager());
     }
 
-    public ToolRecipes(ICraftingManager CraftingManager) {
-        manager = CraftingManager;
+    public ToolRecipes(ICraftingManager craftingManager) {
+        manager = craftingManager;
     }
     
     /**
@@ -34,9 +39,9 @@ public class ToolRecipes {
      * @param toolMaterial	Material item to use
      * @param tools			Tools that must be crafted.
      */
-    public void AddToolSetRecipes(Item toolMaterial, Item... tools) {
+    public void AddToolSetRecipes(ResourceLocation name, Item toolMaterial, Item... tools) {
         for (int i = 0; i < tools.length && i < patterns.size(); i++) {
-            manager.addRecipe(new ItemStack(tools[i]), patterns.get(i), '#', stickMaterial, 'X', toolMaterial);
+            manager.addRecipe(name, new ItemStack(tools[i]), patterns.get(i), '#', stickMaterial, 'X', toolMaterial);
         }
     }
     

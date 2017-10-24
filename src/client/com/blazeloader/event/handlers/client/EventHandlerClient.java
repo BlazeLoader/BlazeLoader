@@ -5,9 +5,8 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.particle.EffectRenderer;
-import net.minecraft.client.particle.EntityFX;
-import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -24,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.blazeloader.api.client.ApiClient;
+import com.blazeloader.api.gui.ApiGui;
 import com.blazeloader.api.gui.CreativeTabGui;
 import com.blazeloader.event.handlers.EventHandler;
 import com.blazeloader.event.listeners.args.ContainerOpenedEventArgs;
@@ -60,8 +60,8 @@ public class EventHandlerClient extends EventHandler {
     }
     
     public static GuiScreen getCreativeGui(Minecraft sender, GuiScreen original) {
-    	if (CreativeTabs.creativeTabArray.length > 12 && original instanceof GuiContainerCreative && !(original instanceof CreativeTabGui)) {
-    		return new CreativeTabGui(sender.thePlayer);
+    	if (ApiGui.getCreativeTabsRegistry().length > 12 && original instanceof GuiContainerCreative && !(original instanceof CreativeTabGui)) {
+    		return new CreativeTabGui(sender.player);
     	}
     	return original;
     }
@@ -70,22 +70,22 @@ public class EventHandlerClient extends EventHandler {
         if (world != null) {
             worldEventClients.all().onWorldLoad(sender, world, message);
         } else {
-            worldEventClients.all().onWorldUnload(sender, sender.theWorld, message);
+            worldEventClients.all().onWorldUnload(sender, sender.world, message);
         }
     }
     
     public static void eventHandleOpenWindow(INetHandlerPlayClient sender, CallbackInfo info, SPacketOpenWindow packet) {
     	Minecraft gameController = Minecraft.getMinecraft();
     	PacketThreadUtil.checkThreadAndEnqueue(packet, sender, gameController);
-        ContainerOpenedEventArgs args = new ContainerOpenedEventArgs(gameController.thePlayer, packet);
-        if (overrideEventClients.all().onContainerOpened(gameController.thePlayer, args)) {
-        	gameController.thePlayer.openContainer.windowId = packet.getWindowId();
+        ContainerOpenedEventArgs args = new ContainerOpenedEventArgs(gameController.player, packet);
+        if (overrideEventClients.all().onContainerOpened(gameController.player, args)) {
+        	gameController.player.openContainer.windowId = packet.getWindowId();
         	info.cancel();
         }
     }
     
-    public static void eventSpawnEffectParticle(EffectRenderer sender, CallbackInfoReturnable<EntityFX> info, int particleId, double x, double y, double z, double xOffset, double yOffset, double zOffset, int ... args) {
-        EntityFX entity = overrideSpawnEffectParticle(particleId, x, y, z, xOffset, yOffset, zOffset, args);
+    public static void eventSpawnEffectParticle(ParticleManager sender, CallbackInfoReturnable<Particle> info, int particleId, double x, double y, double z, double xOffset, double yOffset, double zOffset, int ... args) {
+        Particle entity = overrideSpawnEffectParticle(particleId, x, y, z, xOffset, yOffset, zOffset, args);
         if (entity != null) {
         	sender.addEffect(entity);
         	info.setReturnValue(entity);
@@ -98,8 +98,8 @@ public class EventHandlerClient extends EventHandler {
     	}
     }
     
-    public static EntityFX overrideSpawnEffectParticle(int particleId, double x, double y, double z, double xOffset, double yOffset, double zOffset, int ... args) {
-        EntityFX entity = null;
+    public static Particle overrideSpawnEffectParticle(int particleId, double x, double y, double z, double xOffset, double yOffset, double zOffset, int ... args) {
+        Particle entity = null;
         for (OverrideListener mod : overrideEventClients) {
             entity = mod.onSpawnParticle(particleId, x, y, z, zOffset, yOffset, zOffset, entity);
         }
@@ -119,8 +119,8 @@ public class EventHandlerClient extends EventHandler {
     		int index = packet.getHeldItemHotbarIndex();
 	    	if (index >= 0 && index < InventoryPlayer.getHotbarSize()) {
 	    		Minecraft mc = Minecraft.getMinecraft();
-	    		if (mc != null && mc.thePlayer != null) {
-					if (!inventoryEventHandlers.all().onSlotSelectionChanged(mc.thePlayer, mc.thePlayer.inventory.getStackInSlot(index), index)) {
+	    		if (mc != null && mc.player != null) {
+					if (!inventoryEventHandlers.all().onSlotSelectionChanged(mc.player, mc.player.inventory.getStackInSlot(index), index)) {
 						info.cancel();
 					}
 	    		}
@@ -131,13 +131,13 @@ public class EventHandlerClient extends EventHandler {
     public static void eventHandleCollectItem(SPacketCollectItem packet) {
     	if (inventoryEventHandlers.size() > 0) {
 	    	Minecraft mc = ApiClient.getClient();
-	    	Entity owner = mc.theWorld.getEntityByID(packet.getEntityID());
-	    	if (owner == null) owner = mc.thePlayer;
-	    	Entity item = mc.theWorld.getEntityByID(packet.getCollectedItemEntityID());
+	    	Entity owner = mc.world.getEntityByID(packet.getEntityID());
+	    	if (owner == null) owner = mc.player;
+	    	Entity item = mc.world.getEntityByID(packet.getCollectedItemEntityID());
 	    	if (item != null) {
 	    		int amount = 1;
 	    		if (item instanceof EntityItem) {
-	    			amount = ((EntityItem)item).getEntityItem().stackSize;
+	    			amount = ((EntityItem)item).getItem().getCount();
 	    		}
 	    		inventoryEventHandlers.all().onItemPickup(owner, item, amount);
 	    	}

@@ -7,7 +7,7 @@ public class Interop {
 	 * 
 	 * @param className	Name of class to look for.
 	 */
-	public static Class getDeclaredClass(String className) {
+	public static Class<?> getDeclaredClass(String className) {
 		if (className != null) {
 			try {
 				return Class.forName(className, false, loader());

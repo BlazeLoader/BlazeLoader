@@ -10,13 +10,13 @@ import com.blazeloader.event.handlers.InternalEventHandler;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.IChunkGenerator;
-import net.minecraft.world.gen.ChunkProviderOverworld;
+import net.minecraft.world.gen.IChunkGenerator;
+import net.minecraft.world.gen.ChunkGeneratorOverworld;
 
-@Mixin(ChunkProviderOverworld.class)
+@Mixin(ChunkGeneratorOverworld.class)
 public abstract class MChunkProviderGenerate implements IChunkGenerator {
 	@Shadow
-	private World worldObj;
+	private World world;
 	
 	@ModifyArg(
 		method = "populate(II)V",
@@ -27,6 +27,6 @@ public abstract class MChunkProviderGenerate implements IChunkGenerator {
 		)
 	)
 	private IBlockState internalSetBlockState(BlockPos pos, IBlockState state, int flag) {
-		return InternalEventHandler.getFluidFrozenState(worldObj, pos, state);
+		return InternalEventHandler.getFluidFrozenState(world, pos, state);
 	}
 }

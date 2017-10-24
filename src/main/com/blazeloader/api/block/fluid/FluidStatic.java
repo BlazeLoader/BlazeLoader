@@ -17,7 +17,8 @@ public abstract class FluidStatic extends BlockStaticLiquid implements Fluid {
 		super(materialIn);
 	}
 	
-	public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock) {
+	@Override
+	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
         if (!checkForMixing(worldIn, pos, state)) {
             startFlowing(worldIn, pos, state);
         }

@@ -25,9 +25,9 @@ public class BlazeLoaderCoreProvider implements CoreProvider {
     	return instance;
     }
     
-    private GameEngine gameEngine;
+    private GameEngine<?, ?> gameEngine;
     
-    public static GameEngine getGameEngine() {
+    public static GameEngine<?, ?> getGameEngine() {
         return instance.gameEngine;
     }
     
@@ -38,7 +38,8 @@ public class BlazeLoaderCoreProvider implements CoreProvider {
     public void onInit() {
     }
     
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void onPostInit(GameEngine<?, ?> engine) {
         gameEngine = engine;
         if (engine.isClient()) {

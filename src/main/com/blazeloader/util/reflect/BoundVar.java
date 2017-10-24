@@ -7,7 +7,7 @@ package com.blazeloader.util.reflect;
  * @param <T>	The declaring class for this field.
  * @param <V>	The value type accepted and returned by this field.
  */
-public class BufferedVar<T, V> extends Variable<T, V> {
+public class BoundVar<T, V> extends Variable<T, V> {
 	
 	private final T instance;
 	
@@ -15,12 +15,13 @@ public class BufferedVar<T, V> extends Variable<T, V> {
 	private boolean valueSet;
 	private V cached;
 	
-	protected BufferedVar(T newInstance, Variable<T,V> original) {
+	protected BoundVar(T newInstance, Variable<T,V> original) {
 		super(original);
 		instance = newInstance;
 	}
 	
-	protected BufferedVar(T newInstance, Class<V> type, String name) {
+	@SuppressWarnings("unchecked")
+	protected BoundVar(T newInstance, Class<V> type, String name) {
 		super((Class<T>)newInstance.getClass(), type, false, name);
 		instance = newInstance;
 	}
@@ -63,7 +64,7 @@ public class BufferedVar<T, V> extends Variable<T, V> {
 	/**
 	 * Creates a new BufferedVar bound to the given instance
 	 */
-	public BufferedVar<T,V> newWithInstance(T newInstance) {
-		return new BufferedVar(newInstance, this);
+	public BoundVar<T,V> newWithInstance(T newInstance) {
+		return new BoundVar<T, V>(newInstance, this);
 	}
 }

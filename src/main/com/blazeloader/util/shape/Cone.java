@@ -63,20 +63,20 @@ public class Cone implements IShape {
 	}
 	
 	public Vec3d computePoint(Random rand) {
-		double pheta = MathHelper.getRandomDoubleInRange(rand, 0, Math.PI * 2);
+		double pheta = MathHelper.nextDouble(rand, 0, Math.PI * 2);
 		double phi = Math.abs(Math.atan(rad / height));
 		
 		if (!hollow) {
-			phi = MathHelper.getRandomDoubleInRange(rand, 0, phi);
+			phi = MathHelper.nextDouble(rand, 0, phi);
 		}
 		
-		double rho = MathHelper.getRandomDoubleInRange(rand, 0, height);
+		double rho = MathHelper.nextDouble(rand, 0, height);
 		
 		double x = rho * Math.sin(phi) * Math.cos(pheta);
 		double y = rho * Math.sin(phi) * Math.sin(pheta);
 		double z = rho * Math.cos(phi);
 		
-		return (new Vec3d(x * stretch.xCoord, y * stretch.yCoord, z * stretch.zCoord)).rotateYaw(yaw).rotatePitch(pitch);
+		return (new Vec3d(x * stretch.x, y * stretch.y, z * stretch.z)).rotateYaw(yaw).rotatePitch(pitch);
 	}
 	
 	public Cone setRotation(float u, float v) {
@@ -88,12 +88,12 @@ public class Cone implements IShape {
 	@Override
 	public boolean isPointInside(Vec3d point) {
 		point = point.rotateYaw(-yaw).rotatePitch(-pitch);
-		point = new Vec3d(point.xCoord / stretch.xCoord, point.yCoord / stretch.yCoord, point.zCoord / stretch.zCoord);
-		if (Math.abs(point.yCoord) < height/2) {
-			double phi = Math.acos(point.zCoord / point.lengthVector());
+		point = new Vec3d(point.x / stretch.x, point.y / stretch.y, point.z / stretch.z);
+		if (Math.abs(point.y) < height/2) {
+			double phi = Math.acos(point.z / point.lengthVector());
 			double maxphi = Math.atan(rad / height);
 			return hollow ? phi <= maxphi : phi == maxphi;
 		}
-		return Math.abs(point.yCoord) == height/2;
+		return Math.abs(point.y) == height/2;
 	}
 }

@@ -2,9 +2,10 @@ package com.blazeloader.api.client.particles;
 
 import com.blazeloader.api.particles.IParticle;
 import com.blazeloader.api.particles.ParticleData;
-import com.blazeloader.api.particles.ParticlesRegister;
-import net.minecraft.client.particle.EntityFX;
+import com.blazeloader.api.particles.ParticlesRegisterClient;
+
 import net.minecraft.client.particle.IParticleFactory;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.entity.Entity;
 
 /**
@@ -26,7 +27,7 @@ public class ApiParticlesClient {
 	 * @return ParticleType representing your particle. Use this to spawn your particle.
 	 */
 	public static IParticle registerParticleFactory(IParticle particle, IParticleFactory factory) {
-		return ParticlesRegister.instance().setFactory(particle, factory);
+		return ParticlesRegisterClient.instance().setFactory(particle, factory);
 	}
 	
 	/**
@@ -37,7 +38,7 @@ public class ApiParticlesClient {
 	 * @param particle	Particle to spawn
 	 */
 	public static void spawnParticleEmitter(Entity e, ParticleData particle) {
-		ParticlesRegister.instance().spawnParticleEmitter(e, particle);
+		ParticlesRegisterClient.instance().spawnParticleEmitter(e, particle);
 	}
 	
     /**
@@ -45,7 +46,7 @@ public class ApiParticlesClient {
      * 
      * @param fx	EntityFX to add.
      */
-    public static void addEffectToRenderer(EntityFX fx) {
-    	ParticlesRegister.instance().addEffectToRenderer(fx);
+    public static void addEffectToRenderer(Particle fx) {
+    	ParticlesRegisterClient.instance().addEffectToRenderer(fx);
     }
 }

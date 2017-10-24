@@ -2,15 +2,15 @@ package com.blazeloader.api.recipe;
 
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
-
-import java.util.List;
 
 public class ReversibleShapelessRecipe extends ShapelessRecipe implements IReversibleRecipe {
 	private boolean anyDirection = true;
 	
-	public ReversibleShapelessRecipe(ItemStack output, List input) {
-		super(output, input);
+	public ReversibleShapelessRecipe(String group, ItemStack output, NonNullList<Ingredient> input) {
+		super(group, output, input);
 	}
 	
 	public ReversibleShapelessRecipe setReverseOnly() {
@@ -23,10 +23,10 @@ public class ReversibleShapelessRecipe extends ShapelessRecipe implements IRever
 	}
 	
 	public boolean matchReverse(ItemStack output, int width, int height) {
-		return width * height >= getRecipeSize() && ItemStack.areItemStacksEqual(output, getRecipeOutput());
+		return canFit(width, height) && ItemStack.areItemStacksEqual(output, getRecipeOutput());
 	}
 	
-	public ItemStack[] getRecipeInput() {
+	public NonNullList<Ingredient> getRecipeInput() {
 		return recipeItems;
 	}
 }

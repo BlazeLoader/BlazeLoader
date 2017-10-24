@@ -13,7 +13,8 @@ public class BasicVersion extends SaveableVersion<BasicVersion> {
 		super(id, name, buildType, versionParts);
 	}
 	
-	protected BasicVersion(AbstractVersion other) {
+	@SuppressWarnings("unchecked")
+	protected BasicVersion(@SuppressWarnings("rawtypes") AbstractVersion other) {
 		super(other);
 	}
 	

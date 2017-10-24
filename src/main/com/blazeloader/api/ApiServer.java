@@ -17,7 +17,7 @@ public class ApiServer {
 			if (enabled) {
 				server.enableProfiling();
 			} else {
-				server.theProfiler.profilingEnabled = false;
+				server.profiler.profilingEnabled = false;
 			}
 		}
 	}

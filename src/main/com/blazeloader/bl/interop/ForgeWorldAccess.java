@@ -1,12 +1,14 @@
 package com.blazeloader.bl.interop;
 
+import com.blazeloader.api.privileged.IWorld;
+
 import net.minecraft.world.World;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.storage.MapStorage;
 
 import com.google.common.collect.ImmutableSetMultimap;
@@ -45,15 +47,15 @@ public interface ForgeWorldAccess {
 	 * @forge This is part of the Forge API specification
 	 * @param <Ticket> A forge chunk manager ticket.
 	 */
-	public default <Ticket> ImmutableSetMultimap<ChunkCoordIntPair, Ticket> getPersistentChunks() {
-		return ImmutableSetMultimap.<ChunkCoordIntPair, Ticket>of();
+	public default <Ticket> ImmutableSetMultimap<ChunkPos, Ticket> getPersistentChunks() {
+		return ImmutableSetMultimap.<ChunkPos, Ticket>of();
 	}
 	
 	/**
 	 * Gets the amount of light a block will allow through
 	 */
 	public default int getBlockLightOpacity(BlockPos pos) {
-		if (!asWorld().isValid(pos)) return 0;
+		if (!((IWorld)asWorld()).isCoordValid(pos)) return 0;
         return asWorld().getChunkFromBlockCoords(pos).getBlockLightOpacity(pos);
 	}
 	

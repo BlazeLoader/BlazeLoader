@@ -2,6 +2,8 @@ package com.blazeloader.api.recipe;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.NonNullList;
 
 /**
  * Interface for an crafting recipe that can be done in reverse. (uncrafting)
@@ -26,5 +28,5 @@ public interface IReversibleRecipe extends IRecipe {
 	/**
 	 * Gets the crafting arrangement taken in order to generate this recipe's output.
 	 */
-	public ItemStack[] getRecipeInput();
+	public NonNullList<Ingredient> getRecipeInput();
 }

@@ -33,6 +33,6 @@ public interface IModLockableInventory extends ILockableContainer {
 	 * @return SoundEvent of the sound
 	 */
 	public default SoundEvent getLockSound() {
-		return SoundEvent.soundEventRegistry.getObject(new ResourceLocation(getLockSoundString()));
+		return SoundEvent.REGISTRY.getObject(new ResourceLocation(getLockSoundString()));
 	}
 }

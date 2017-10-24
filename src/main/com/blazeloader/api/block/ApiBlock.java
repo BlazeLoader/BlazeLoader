@@ -2,18 +2,18 @@ package com.blazeloader.api.block;
 
 import com.blazeloader.api.item.ApiItem;
 import com.blazeloader.util.version.Versions;
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.mumfrey.liteloader.client.ducks.IMutableRegistry;
 
-import net.acomputerdog.core.util.MathUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemMultiTexture;
+import net.minecraft.item.ItemMultiTexture.Mapper;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.RegistryNamespacedDefaultedByKey;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -37,7 +37,7 @@ public class ApiBlock {
      * @return the block for simplicity
      */
     public static <T extends Block> T registerFireInfo(T block, int encouragement, int flamability) {
-    	Blocks.fire.setFireInfo(block, encouragement, flamability);
+    	Blocks.FIRE.setFireInfo(block, encouragement, flamability);
     	return block;
     }
     
@@ -54,8 +54,9 @@ public class ApiBlock {
      *
      * @return the block for simplicity
      */
-    public static <T extends Block> T quickRegisterBlock(int id, String mod, String name, T block) {
-        return registerBlock(id, new ResourceLocation(mod, name), (T) block.setUnlocalizedName(mod + "." + name), (new ItemBlock(block)).setUnlocalizedName(mod + "." + name));
+    @SuppressWarnings("unchecked")
+	public static <T extends Block> T quickRegisterBlock(int id, String mod, String name, T block) {
+        return registerBlock(id, new ResourceLocation(mod, name), (T) block.setUnlocalizedName(mod + "." + name), (ItemBlock)(new ItemBlock(block)).setUnlocalizedName(mod + "." + name));
     }
 
     /**
@@ -142,7 +143,7 @@ public class ApiBlock {
      * 
      * @return the block for simplicity
      */
-    public static <K extends Block,V extends K> V replaceBlock(K original, V block, Function nameFunc) {
+    public static <K extends Block,V extends K> V replaceBlock(K original, V block, Mapper nameFunc) {
     	return replaceBlock(original, block, new ItemMultiTexture(block, block, nameFunc));
     }
     
@@ -175,22 +176,28 @@ public class ApiBlock {
      * 
      * @return the block for simplicity
      */
-    public static <K extends Block,V extends K> V replaceBlock(K original, V block) {
+    @SuppressWarnings("deprecation")
+	public static <K extends Block,V extends K> V replaceBlock(K original, V block) {
+    	
     	Map<Integer, IBlockState> builtStates = new HashMap<Integer, IBlockState>();
+    	
     	for (IBlockState original_state : (List<IBlockState>)original.getBlockState().getValidStates()) {
     		int original_metadata = getBlockId(original) << 4 | original.getMetaFromState(original_state);
-    		builtStates.put(Integer.valueOf(original_metadata), original_state);
+    		builtStates.put(original_metadata, original_state);
     	}
+    	
     	for (IBlockState state : (List<IBlockState>)block.getBlockState().getValidStates()) {
     		int metadata = getBlockId(original) << 4 | block.getMetaFromState(state);
-    		builtStates.put(Integer.valueOf(metadata), state);
+    		builtStates.put(metadata, state);
     	}
+    	
     	for (Map.Entry<Integer, IBlockState> i : builtStates.entrySet()) {
     		if (i.getValue().getBlock() == original) {
     			Block.BLOCK_STATE_IDS.put(block.getStateFromMeta(i.getKey()), i.getKey());
     		}
     		Block.BLOCK_STATE_IDS.put(i.getValue(), i.getKey());
     	}
+    	
     	injectBlock(getBlockId(original), getBlockName(original), block);
     	if (Versions.isClient()) {
     		com.blazeloader.api.client.render.ApiRenderBlock.swapoutBlockModels(original, block);
@@ -221,11 +228,12 @@ public class ApiBlock {
      * @param name  The name to register the block as
      * @param block The block to add
      */
-    public static void injectBlock(int id, ResourceLocation name, Block block) {
-    	boolean exists = Block.blockRegistry.containsKey(name);
+    @SuppressWarnings("unchecked")
+	public static void injectBlock(int id, ResourceLocation name, Block block) {
+    	boolean exists = getBlockRegistry().containsKey(name);
     	if (exists) {
-    		Block existing = Block.blockRegistry.getObject(name);
-    		((IMutableRegistry<ResourceLocation, Block>)Block.blockRegistry).removeObjectFromRegistry(name);
+    		Block existing = getBlockRegistry().getObject(name);
+    		((IMutableRegistry<ResourceLocation, Block>)getBlockRegistry()).removeObjectFromRegistry(name);
     		try {
 	    		for (Field field : Blocks.class.getDeclaredFields()) {
 	                if (field.get(null).equals(existing)) {
@@ -234,12 +242,12 @@ public class ApiBlock {
 	            }
     		} catch (Exception e) {}
     	}
-    	Block.blockRegistry.register(id, name, block);
+    	getBlockRegistry().register(id, name, block);
     }
     
     private static void applyPostRegisterConditions(Block block) {
     	for (IBlockState state : (ImmutableList<IBlockState>)block.getBlockState().getValidStates()) {
-            int metadata = Block.blockRegistry.getIDForObject(block) << 4 | block.getMetaFromState(state);
+            int metadata = getBlockRegistry().getIDForObject(block) << 4 | block.getMetaFromState(state);
             Block.BLOCK_STATE_IDS.put(state, metadata);
         }
     }
@@ -288,23 +296,13 @@ public class ApiBlock {
     }
     
     /**
-     * Gets a block by it's name or ID
-     *
-     * @param identifier A string representing the name or ID of the block.
-     * @return The block defined by parameter identifier
-     */
-    public static Block getBlockByNameOrId(String identifier) {
-        return MathUtils.isInteger(identifier) ? getBlockById(Integer.parseInt(identifier)) : getBlockByName(identifier);
-    }
-    
-    /**
      * Gets the name of a block.
      *
      * @param block The block to get the name for
      * @return Return a string of the name belonging to param block
      */
     public static ResourceLocation getBlockName(Block block) {
-        return (ResourceLocation)Block.blockRegistry.getNameForObject(block);
+        return getBlockRegistry().getNameForObject(block);
     }
     
     /**
@@ -358,4 +356,7 @@ public class ApiBlock {
     	return Block.getIdFromBlock(block);
     }
     
+    public static RegistryNamespacedDefaultedByKey<ResourceLocation, Block> getBlockRegistry() {
+    	return Block.REGISTRY;
+    }
 }

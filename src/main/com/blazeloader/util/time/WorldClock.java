@@ -14,10 +14,6 @@ public class WorldClock implements IPreciseTime, IDate {
 		world = referenceFrame;
 	}
 	
-	public void setWorld(World w) {
-		world = w;
-	}
-	
 	public String getDate() {
 		return padded(getDay()) + "-" + padded(getMonth().ordinal() + 1) + "-" + padded(getYears());
 	}
@@ -48,14 +44,6 @@ public class WorldClock implements IPreciseTime, IDate {
 	
 	public int getDay() {
 		return getDays() - getMonths()*30;
-	}
-	
-	public Day getDayOfWeek() {
-		return Day.values()[getDays() % 7];
-	}
-	
-	public Month getMonth() {
-		return Month.values()[getMonths() % 12];
 	}
 	
 	/**

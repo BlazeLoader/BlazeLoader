@@ -16,6 +16,7 @@ import com.blazeloader.util.data.Tuple.Tuple2;
 /**
  * Javascript array methods re-implemented in Java. Any ones not found here are probably already in (@code ArrayUtils}.
  */
+@SuppressWarnings("unchecked")
 public class JSArrayUtils {
 	
 	/**
@@ -62,7 +63,7 @@ public class JSArrayUtils {
     /**
      * Joins one or more arrays or array elements onto the given array and returns the result.
      */
-    public static <T> T[] concat(T[] array, Object... concatted) {
+	public static <T> T[] concat(T[] array, Object... concatted) {
     	T[] result = array;
     	for (int i = 0; i < concatted.length; i++) {
     		if (concatted[i].getClass() == array.getClass()) {
@@ -132,7 +133,7 @@ public class JSArrayUtils {
 	 * <p>
 	 * List cannot be empty.
 	 */
-    public static <T> T[] toArray(List<T> newa) {
+	public static <T> T[] toArray(List<T> newa) {
     	if (newa.size() == 0) throw new IllegalArgumentException("List cannot be empty");
     	return (T[])toArray(newa, getBaseClass(newa.get(0).getClass())); //Shut-up, gradle >.>
     }
@@ -151,7 +152,7 @@ public class JSArrayUtils {
     	return (T[]) Array.newInstance(arr.getClass().getComponentType(), length);
     }
     
-    private static Class getBaseClass(Class c) {
+    private static <T> Class<? super T> getBaseClass(Class<? super T> c) {
     	while (c.getSuperclass() != Object.class && c.getSuperclass() != null) {
     		c = c.getSuperclass();
     	}
@@ -266,11 +267,11 @@ public class JSArrayUtils {
     			return initial[0];
     		}
     	}
-    	Object ini = initial.length > 0 ? initial[0] :  arr[1];
+    	V ini = initial.length > 0 ? initial[0] :  (V)arr[1];
     	for (int i = 0; i < arr.length; i ++) {
-    		ini = callback.apply(new Folds(arr, i, ini));
+    		ini = callback.apply(new Folds<T, V>(arr, i, ini));
     	}
-    	return (V)ini;
+    	return ini;
     }
     
     /**
@@ -284,16 +285,16 @@ public class JSArrayUtils {
     			return initial[0];
     		}
     	}
-    	Object ini;
+    	V ini;
     	int i = arr.length - 1;
     	if (initial.length > 0) {
     		ini = initial[0];
     	} else {
     		i--;
-    		ini = arr[arr.length - 1];
+    		ini = (V)arr[arr.length - 1];
     	}
     	for (; i <= 0; i--) {
-    		ini = callback.apply(new Folds(arr, i, ini));
+    		ini = callback.apply(new Folds<T, V>(arr, i, ini));
     	}
     	return (V)ini;
     }

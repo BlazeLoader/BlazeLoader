@@ -105,7 +105,7 @@ public final class ParticleData {
 	 * @return this ParticleData
 	 */
 	public ParticleData setPos(Vec3d pos) {
-		return setPos(pos.xCoord, pos.yCoord, pos.zCoord);
+		return setPos(pos.x, pos.y, pos.z);
 	}
 	
 	/**
@@ -138,7 +138,7 @@ public final class ParticleData {
 	 * @return	this ParticleData
 	 */
 	public ParticleData setVel(Vec3d vel) {
-		return setVel(vel.xCoord, vel.yCoord, vel.zCoord);
+		return setVel(vel.x, vel.y, vel.z);
 	}
 	
 	/**
@@ -172,7 +172,7 @@ public final class ParticleData {
 	 * @return this ParticleData
 	 */
 	public ParticleData withPos(Vec3d pos) {
-		return setPos(pos.xCoord, pos.yCoord, pos.zCoord);
+		return setPos(pos.x, pos.y, pos.z);
 	}
 	
 	/**
@@ -196,7 +196,7 @@ public final class ParticleData {
 	 * @return	this ParticleData
 	 */
 	public ParticleData withVel(Vec3d vel) {
-		return withVel(vel.xCoord, vel.yCoord, vel.zCoord);
+		return withVel(vel.x, vel.y, vel.z);
 	}
 	
 	/**

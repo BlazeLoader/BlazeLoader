@@ -9,24 +9,25 @@ import com.blazeloader.bl.obf.BLOBF;
  * @param <T> The interface type containing the method signature used.
  * @param <R> The return type for this method
  */
-public class BufferedFunc<I, T, R> extends Function<I, T, R> {
+public class BoundFunc<I, T, R> extends Function<I, T, R> {
 	
 	private final I instance;
 	private T lambda;
 	
-	public BufferedFunc(Class<T> interfaceType, I context, Class<R> returnType, String name, Class... pars) {
+	@SuppressWarnings("unchecked")
+	public BoundFunc(Class<T> interfaceType, I context, Class<R> returnType, String name, Class<?>... pars) {
 		super(interfaceType, (Class<I>)context.getClass(), returnType, name, false, pars);
 		instance = context;
 		init();
 	}
 	
-	public BufferedFunc(Class<T> interfaceType, I context, BLOBF obf) {
+	public BoundFunc(Class<T> interfaceType, I context, BLOBF obf) {
 		super(interfaceType, false ,obf);
 		instance = context;
 		init();
 	}
 	
-	protected BufferedFunc(I context, Function<I, T, R> other) {
+	protected BoundFunc(I context, Function<I, T, R> other) {
 		super(other);
 		instance = context;
 		init();
@@ -51,6 +52,7 @@ public class BufferedFunc<I, T, R> extends Function<I, T, R> {
 	 * @return	The returned result of the method
 	 * @throws Throwable if there is any error.
 	 */
+	@SuppressWarnings("unchecked")
 	public R apply(Object... args) throws Throwable {
 		return (R)handle.target.bindTo(instance).invokeWithArguments(args);
 	}
@@ -79,7 +81,7 @@ public class BufferedFunc<I, T, R> extends Function<I, T, R> {
 	/**
 	 * Creates a new BufferedFunc bound to the given instance
 	 */
-	public BufferedFunc<I, T, R> newWithInstance(I newInstance) {
-		return new BufferedFunc(newInstance, this);
+	public BoundFunc<I, T, R> newWithInstance(I newInstance) {
+		return new BoundFunc<I, T, R>(newInstance, this);
 	}
 }

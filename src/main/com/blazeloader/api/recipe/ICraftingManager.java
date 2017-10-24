@@ -1,10 +1,11 @@
 package com.blazeloader.api.recipe;
 
-import java.util.List;
-
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 /**
@@ -22,20 +23,13 @@ public interface ICraftingManager extends Comparable<ICraftingManager> {
 	 */
 	public int getId();
 	
-	/**
-	 * Returns an unmodifieable list of recipes registered to this CraftingManager.
-	 * 
-	 * @return List of Recipes
-	 */
-	public List<IRecipe> getRecipeList();
-	
     /**
      * Adds a shaped recipe to this CraftingManager.
      * 
      * @param output	ItemStack output for this recipe
      * @param input		Strings of recipe pattern followed by chars mapped to Items/Blocks/ItemStacks
      */
-	public ShapedRecipe addRecipe(ItemStack output, Object... input);
+	public ShapedRecipe addRecipe(ResourceLocation name, ItemStack output, Object... input);
 	
     /**
      * Adds a shapeless crafting recipe to this CraftingManager.
@@ -43,7 +37,7 @@ public interface ICraftingManager extends Comparable<ICraftingManager> {
      * @param output	ItemStack output for this recipe
      * @param input		An array of ItemStack's Item's and Block's that make up the recipe.
      */
-	public ShapelessRecipe addShapelessRecipe(ItemStack output, Object... input);
+	public ShapelessRecipe addShapelessRecipe(ResourceLocation name, ItemStack output, Object... input);
 	
     /**
      * Adds a shaped recipe to this CraftingManager.
@@ -51,7 +45,7 @@ public interface ICraftingManager extends Comparable<ICraftingManager> {
      * @param output	ItemStack output for this recipe
      * @param input		Strings of recipe pattern followed by chars mapped to Items/Blocks/ItemStacks
      */
-	public ReversibleShapedRecipe addReverseRecipe(ItemStack output, Object... input);
+	public ReversibleShapedRecipe addReverseRecipe(ResourceLocation name, ItemStack output, Object... input);
 	
     /**
      * Adds a shapeless crafting recipe to this CraftingManager.
@@ -59,14 +53,14 @@ public interface ICraftingManager extends Comparable<ICraftingManager> {
      * @param output	ItemStack output for this recipe
      * @param input		An array of ItemStack's Item's and Block's that make up the recipe.
      */
-	public ReversibleShapelessRecipe addReverseShapelessRecipe(ItemStack output, Object... input);
+	public ReversibleShapelessRecipe addReverseShapelessRecipe(ResourceLocation name, ItemStack output, Object... input);
 	
     /**
      * Adds an IRecipe to this RecipeManager.
      *  
      * @param recipe A recipe that will be added to the recipe list.
      */
-	public void addRecipe(IRecipe recipe);
+	public void addRecipe(ResourceLocation name, IRecipe recipe);
 	
     /**
      * Removes the given recipe
@@ -113,9 +107,9 @@ public interface ICraftingManager extends Comparable<ICraftingManager> {
      * @param width			width of crafting table
      * @param height		height of crafting table
      * 
-     * @return ItemStack[] array of inventory contents needed
+     * @return NonNullList<Ingredient> of inventory contents needed
      */
-	public ItemStack[] findRecipeInput(ItemStack recipeOutput, int width, int height);
+	public NonNullList<Ingredient> findRecipeInput(ItemStack recipeOutput, int width, int height);
 	 
     /**
      * Gets the remaining contents for the inventory after performing a craft.
@@ -123,10 +117,19 @@ public interface ICraftingManager extends Comparable<ICraftingManager> {
      * @param inventory		inventory containing the crafting materials
      * @param world			the world that the crafting is being done in (usually the world of the player)
      * 
-     * @return ItemStack[] array of remaining items
+     * @return NonNullList<ItemStack> list of remaining items
      */
-	public ItemStack[] getUnmatchedInventory(InventoryCrafting inventory, World world);
-
+	public NonNullList<ItemStack> getUnmatchedInventory(InventoryCrafting inventory, World world);
+	
+	/**
+	 * Loads recipe values from a local path similar to vanilla minecraft in 1.10+
+	 * 
+	 * Does NOT support reverse crafting (yet)
+	 * 
+	 * @param path			The location to search for crafting recipes
+	 */
+	public void loadRecipesFromJSON(String path);
+	
 	public default int compareTo(ICraftingManager o) {
 		return o.getId() - getId();
 	}

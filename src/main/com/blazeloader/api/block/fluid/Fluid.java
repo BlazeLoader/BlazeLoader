@@ -19,12 +19,12 @@ public interface Fluid {
 	 * @param state	Current block state.
 	 * @return	True if there is water against the applicable side of this block.
 	 */
-	public boolean isAdjacentWater(World w, BlockPos pos, EnumFacing side, IBlockState state);
+	boolean isAdjacentWater(World w, BlockPos pos, EnumFacing side, IBlockState state);
 	
 	/**
 	 * Gets the blockstate this fluid must turn into when it freezes.
 	 */
-	public IBlockState getFrozenState();
+	IBlockState getFrozenState();
 	
 	/**
 	 * Checks if this block can freeze. (be replaced with ice)
@@ -38,15 +38,15 @@ public interface Fluid {
 	 * @param state	Current block state.
 	 * @return	True if this block can greeze here.
 	 */
-	public boolean canFreeze(World w, BlockPos pos, IBlockState state);
+	boolean canFreeze(World w, BlockPos pos, IBlockState state);
 	
 	/**
 	 * Gets the non-flowing variant of this block.
 	 */
-	public FluidStatic getStaticBlock();
+	FluidStatic getStaticBlock();
 	
 	/**
 	 * Gets the flowing variant of this block.
 	 */
-	public FluidFlowing getFlowingBlock();
+	FluidFlowing getFlowingBlock();
 }

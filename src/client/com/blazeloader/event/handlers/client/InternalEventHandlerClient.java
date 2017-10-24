@@ -12,6 +12,8 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.RayTraceResult;
 
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -30,11 +32,11 @@ public class InternalEventHandlerClient {
 	public static void eventDispatchKeypresses(Minecraft sender) {
 		if (EventHandler.inventoryEventHandlers.size() > 0) {
 			if (sender == null) return;
-			if (sender.thePlayer != null && !sender.thePlayer.isSpectator()) {
+			if (sender.player != null && !sender.player.isSpectator()) {
 				if (sender.currentScreen == null || sender.currentScreen.allowUserInput) {
 					for (int i = 0; i < sender.gameSettings.keyBindsHotbar.length; i++) {
 			            if (sender.gameSettings.keyBindsHotbar[i].isPressed()) {
-		                    if (EventHandler.inventoryEventHandlers.all().onSlotSelectionChanged(sender.thePlayer, sender.thePlayer.inventory.getCurrentItem(), i)) {
+		                    if (EventHandler.inventoryEventHandlers.all().onSlotSelectionChanged(sender.player, sender.player.inventory.getCurrentItem(), i)) {
 		                    	KeyBinding.onTick(sender.gameSettings.keyBindsHotbar[i].getKeyCode());
 		                    }
 		                    break;
@@ -56,21 +58,42 @@ public class InternalEventHandlerClient {
     }
     
     public static void eventMiddleClickMouse(Minecraft sender, CallbackInfo info) {
-    	if (sender.objectMouseOver != null && sender.objectMouseOver.typeOfHit == RayTraceResult.Type.ENTITY) {
-    		Entity entity = sender.objectMouseOver.entityHit;
-    		if (entity instanceof IMousePickHandler) {
-    			ItemStack stack = ((IMousePickHandler)entity).onPlayerMiddleClick(sender.thePlayer);
-    			if (stack != null && stack.stackSize > 0) {
-    				boolean creative = sender.thePlayer.capabilities.isCreativeMode;
-    				InventoryPlayer inventory = sender.thePlayer.inventory;
-    				inventory.func_184434_a(stack);
-    				if (creative) {
-    	                int change = sender.thePlayer.inventoryContainer.inventorySlots.size() - 9 + inventory.currentItem;
-    	                sender.playerController.sendSlotPacket(inventory.getStackInSlot(inventory.currentItem), change);
-    	            }
-    				info.cancel();
+    	IMousePickHandler handler = null;
+    	boolean creative = sender.player.capabilities.isCreativeMode;
+    	
+    	if (sender.objectMouseOver != null) {
+    		if (sender.objectMouseOver.typeOfHit == RayTraceResult.Type.ENTITY) {
+	    		Entity entity = sender.objectMouseOver.entityHit;
+	    		if (entity instanceof IMousePickHandler) {
+	    			handler = (IMousePickHandler)entity;
+	    		}
+    		} else if (creative && sender.objectMouseOver.typeOfHit == RayTraceResult.Type.BLOCK) {
+    			TileEntity tileentity = sender.world.getTileEntity(sender.objectMouseOver.getBlockPos());
+    			if (tileentity != null && tileentity instanceof IMousePickHandler) {
+    				handler = (IMousePickHandler)tileentity;
     			}
     		}
+    	}
+    	
+    	if (handler != null) {
+	    	ItemStack stack = handler.onPlayerMiddleClick(sender.player);
+	    	if (stack != null && !stack.isEmpty()) {
+				InventoryPlayer inventory = sender.player.inventory;
+				
+				int i = inventory.getSlotFor(stack);
+				
+				if (creative) {
+					inventory.setPickedItemStack(stack);
+	                sender.playerController.sendSlotPacket(sender.player.getHeldItem(EnumHand.MAIN_HAND), 36 + inventory.currentItem);
+	            } else if (i > -1) {
+                    if (InventoryPlayer.isHotbar(i)) {
+                        inventory.currentItem = i;
+                    } else {
+                        sender.playerController.pickItem(i);
+                    }
+                }
+				info.cancel();
+			}
     	}
     }
     

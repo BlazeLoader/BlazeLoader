@@ -19,17 +19,14 @@ import net.minecraft.world.World;
 
 @Mixin(EntityPlayer.class)
 public abstract class MEntityPlayer extends EntityLivingBase {
-
-	public MEntityPlayer(World worldIn) {
-		super(worldIn);
-	}
+	public MEntityPlayer(World worldIn) {super(worldIn);}
 	
 	@Inject(method = "<init>(Lnet/minecraft/world/World;Lcom/mojang/authlib/GameProfile;)V", at = @At("RETURN"))
 	private void onInit(World w, GameProfile profile, CallbackInfo info) {
 		EventHandler.initEntityPlayer((EntityPlayer)(Object)this, w, profile);
 	}
 
-	@Inject(method = "clonePlayer(Lnet/minecraft/entity/player/EntityPlayer;Z)V", at = @At("RETURN"))
+	@Inject(method = "copyFrom(Lnet/minecraft/entity/player/EntityPlayer;Z)V", at = @At("RETURN"))
 	private void onClonePlayer(EntityPlayer old, boolean respawnedFromEnd, CallbackInfo info) {
 		InternalEventHandler.eventClonePlayer((EntityPlayer)(Object)this, old, respawnedFromEnd);
 	}

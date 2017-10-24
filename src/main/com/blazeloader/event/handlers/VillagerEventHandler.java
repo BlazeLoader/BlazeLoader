@@ -29,7 +29,7 @@ public class VillagerEventHandler {
 		if (!lockProfession) return;
 		lockProfession = false;
 		info.cancel();
-		sender.setProfession(Professions.instance().randomProfessionId(sender.worldObj.rand));
+		sender.setProfession(Professions.instance().randomProfessionId(sender.getEntityWorld().rand));
 	}
 	
 	public static void eventPopulateBuyingList(EntityVillager sender, CallbackInfo info) {
@@ -52,7 +52,8 @@ public class VillagerEventHandler {
     	Mix.intercept(Professions.instance().getDisplayName(sender), info);
     }
     
-    public static void eventGetEntityTexture(EntityVillager sender, CallbackInfoReturnable info) {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public static void eventGetEntityTexture(EntityVillager sender, CallbackInfoReturnable info) {
 		Mix.intercept(Professions.instance().getResourceLocation(sender), info);
     }
 }

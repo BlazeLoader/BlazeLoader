@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import com.blazeloader.api.client.ApiClient;
 import com.blazeloader.bl.main.BLMain;
+import com.google.common.base.MoreObjects;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
 
@@ -56,7 +57,7 @@ public class SkinProvider {
 	 * Returns true if a skin location has been loaded.
 	 */
 	public boolean hasSkin() {
-        return this.playerSkins.containsKey(Type.SKIN);
+        return playerSkins.containsKey(Type.SKIN);
     }
 	
 	/**
@@ -78,8 +79,7 @@ public class SkinProvider {
 	 * @return	Associated skin type, or a default based on their id hash.
 	 */
 	public String getSkinType() {
-		String result = playerInfo.getSkinType();
-		return result == null ? DefaultPlayerSkin.getSkinType(playerInfo.uuid) : result;
+		return MoreObjects.firstNonNull(playerInfo.getSkinType(), DefaultPlayerSkin.getSkinType(playerInfo.uuid));
 	}
 	
 	/**
@@ -88,8 +88,7 @@ public class SkinProvider {
 	 * @return	The skin resource location, or the default if one is not available.
 	 */
 	public ResourceLocation provideSkin() {
-		ResourceLocation result = provideTexture(Type.SKIN);
-    	return result == null ? DefaultPlayerSkin.getDefaultSkin(playerInfo.uuid) : result;
+    	return MoreObjects.firstNonNull(provideTexture(Type.SKIN), DefaultPlayerSkin.getDefaultSkin(playerInfo.uuid));
 	}
 	
 	/**

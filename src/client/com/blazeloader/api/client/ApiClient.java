@@ -5,7 +5,7 @@ import com.blazeloader.bl.main.BlazeLoaderCoreProvider;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.particle.EffectRenderer;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -14,7 +14,7 @@ import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.ResourcePackRepository;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.world.WorldSettings;
+import net.minecraft.world.GameType;
 
 public class ApiClient {
 	
@@ -37,7 +37,7 @@ public class ApiClient {
      * @return the client's player
      */
     public static EntityPlayerSP getPlayer() {
-        return getClient().thePlayer;
+        return getClient().player;
     }
     
     public static GameSettings getGameSettings() {
@@ -48,7 +48,7 @@ public class ApiClient {
      * Gets the render item currently used
      */
     public static RenderItem getRenderItem() {
-    	return getClient().renderItem;
+    	return getClient().getRenderItem();
     }
     
     /**
@@ -82,7 +82,7 @@ public class ApiClient {
     /**
      * Gets the client effect renderer
      */
-    public static EffectRenderer getEffectRenderer() {
+    public static ParticleManager getEffectRenderer() {
     	return getClient().effectRenderer;
     }
     
@@ -108,7 +108,7 @@ public class ApiClient {
 	 * @param type			The gametype
 	 * @param allowCheats	True to let players execute commands (cheats)
 	 */
-	public static void shareToLAN(WorldSettings.GameType type, boolean allowCheats) {
+	public static void shareToLAN(GameType type, boolean allowCheats) {
 		IntegratedServer server = getIntegratedServer();
 		if (server != null) {
 			server.shareToLAN(type, allowCheats);

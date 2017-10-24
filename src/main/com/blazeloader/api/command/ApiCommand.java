@@ -70,6 +70,6 @@ public class ApiCommand {
      * @param command The command to execute.
      */
     public static void useCommand(ICommandSender sender, ICommand command) {
-        useCommand(sender, command.getCommandName());
+        useCommand(sender, command.getName());
     }
 }

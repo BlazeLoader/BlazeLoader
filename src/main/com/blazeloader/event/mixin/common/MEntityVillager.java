@@ -1,7 +1,7 @@
 package com.blazeloader.event.mixin.common;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -16,32 +16,27 @@ import net.minecraft.entity.IMerchant;
 import net.minecraft.entity.INpc;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.world.DifficultyInstance;
 
 @Mixin(EntityVillager.class)
 public abstract class MEntityVillager extends EntityAgeable implements IMerchant, INpc, IEntityVillager {
-	private MEntityVillager() {super(null);}
+	private MEntityVillager() { super(null); }
 	
-	@Shadow
-	private MerchantRecipeList buyingList;
-	public MerchantRecipeList getMerchentRecipes() {return buyingList;}
-	public void setMerchentRecipes(MerchantRecipeList list) {buyingList = list;}
+	@Accessor("PROFESSION") public abstract DataParameter<Integer> getProfessionDataParameter();
 	
-	@Shadow
-	private int careerId;
-	public int getCareer() {return careerId;}
-	public void setCareer(int career) {careerId = career;}
+	@Accessor("buyingList") public abstract  MerchantRecipeList getMerchentRecipes();
+	@Accessor("buyingList") public abstract void setMerchentRecipes(MerchantRecipeList list);
 	
-	@Shadow
-	private int careerLevel;
-	public int getCareerLevel() {return careerLevel;}
-	public void setCareerLevel(int level) {careerLevel = level;}
+	@Accessor("careerId") public abstract int getCareer();
+	@Accessor("careerId") public abstract void setCareer(int career);
 	
-	@Shadow
-	private boolean areAdditionalTasksSet;
-	public boolean areAdditionalTasksSet() {return areAdditionalTasksSet;}
+	@Accessor("careerLevel") public abstract int getCareerLevel();
+	@Accessor("careerLevel") public abstract void setCareerLevel(int level);
+	
+	@Accessor("areAdditionalTasksSet") public abstract boolean areAdditionalTasksSet();
 	
 	@Inject(method = "onInitialSpawn(Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/entity/IEntityLivingData;)Lnet/minecraft/entity/IEntityLivingData;", at = @At("HEAD"), cancellable = true)
 	private void onOnInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata, CallbackInfoReturnable<IEntityLivingData> info) {

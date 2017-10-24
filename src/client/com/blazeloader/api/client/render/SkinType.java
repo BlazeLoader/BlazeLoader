@@ -47,6 +47,7 @@ public final class SkinType implements IStringable<SkinType> {
 		return result;
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <T> T valueOf(Class<T> enumType, String name) {
 		if (enumType == SkinType.class) return (T)valueOf(name);
 		return (T)Enum.valueOf((Class<? extends Enum>)enumType, name);

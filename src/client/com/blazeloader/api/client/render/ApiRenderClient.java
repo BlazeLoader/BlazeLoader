@@ -45,7 +45,7 @@ public class ApiRenderClient {
      * @param centered Center the text around the coordinates specified.
      */
     public static void drawString(String string, int x, int y, int color, boolean shadow, boolean centered) {
-        FontRenderer render = ApiClient.getClient().fontRendererObj;
+        FontRenderer render = ApiClient.getClient().fontRenderer;
         if (centered) {
             x -= render.getStringWidth(string) / 2;
         }

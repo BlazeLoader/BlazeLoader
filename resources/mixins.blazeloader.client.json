@@ -4,11 +4,21 @@
   "package": "com.blazeloader.event.mixin.client",
   "refmap":  "mixins.blazeloader.refmap.json",
   "mixins": [
-    "MClientBrandRetriever","MMinecraft","MGuiContainerCreative",
-    "MEntityPlayerSP",
-    "MNetHandlerPlayClient",
+    "MBlockModelShapes",
+    "MBlockStateMapper",
+    "MClientBrandRetriever",
     "MEffectRenderer",
-    "MBlockModelShapes","MRenderItem","MRenderVillager","MTileEntityItemStackRenderer",
-    "MModelBakery"
+    "MEntityPlayerSP",
+    "MGuiContainerCreative",
+    "MMinectraft",
+    "MModelBrakery",
+    "MNetHandlerPlayClient",
+    "MRenderItem",
+    "MRenderManager",
+    "MRenderVillager",
+    "MTileEntityItemStackRenderer",
+    "MTileEntityRendererDispatcher",
+    "MTimer",
+    "MVertexBUffer"
   ]
 }

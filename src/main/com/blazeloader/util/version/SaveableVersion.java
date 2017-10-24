@@ -12,7 +12,7 @@ public abstract class SaveableVersion<T extends SaveableVersion<T>> extends Abst
 		super(id, name, buildType, versionParts);
 	}
 	
-	protected SaveableVersion(AbstractVersion other) {
+	protected SaveableVersion(AbstractVersion<T> other) {
 		super(other);
 	}
 	

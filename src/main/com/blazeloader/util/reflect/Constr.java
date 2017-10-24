@@ -2,8 +2,15 @@ package com.blazeloader.util.reflect;
 
 import com.blazeloader.bl.obf.BLOBF;
 
+/**
+ * Class Constructor
+ * 
+ * Represents a reference to the <init> method of a class accepting the provided parameters.
+ * 
+ * @param <I>	The owning class and type of created instances.
+ */
 public class Constr<I> extends Function<I, Object, Void> {
-	public Constr(Class<I> context, Class... pars) {
+	public Constr(Class<I> context, Class<?>... pars) {
 		super(null, context, void.class, "<init>", false, pars);
 	}
 	
@@ -24,6 +31,7 @@ public class Constr<I> extends Function<I, Object, Void> {
 	/**
 	 * Creates a new instance of an object using the underlying constructor.
 	 */
+	@SuppressWarnings("unchecked")
 	public I call(Object... args) throws Throwable {
 		return (I)handle.target.invokeWithArguments(args);
 	}

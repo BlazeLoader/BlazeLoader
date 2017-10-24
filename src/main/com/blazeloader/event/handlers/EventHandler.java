@@ -6,8 +6,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.blazeloader.api.ApiServer;
-import com.blazeloader.api.entity.properties.EntityPropertyManager;
 import com.blazeloader.api.world.gen.UnpopulatedChunksQ;
+import com.blazeloader.api.privileged.IWorld;
 import com.blazeloader.event.listeners.*;
 import com.blazeloader.event.listeners.args.BlockEventArgs;
 import com.blazeloader.event.listeners.args.EntitySpawnEventArgs;
@@ -99,10 +99,10 @@ public class EventHandler {
     			}
     			if (args.getForced() != entity.forceSpawn) {
     				entity.forceSpawn = args.getForced();
-    				info.setReturnValue(sender.spawnEntityInWorld(entity));
+    				info.setReturnValue(sender.spawnEntity(entity));
     				entity.forceSpawn = !entity.forceSpawn;
     			} else if (args.getEntityChanged()) {
-    				info.setReturnValue(sender.spawnEntityInWorld(entity));
+    				info.setReturnValue(sender.spawnEntity(entity));
     			}
     			eventSpawnEntityInWorld = false;
     		}
@@ -112,7 +112,7 @@ public class EventHandler {
     private static boolean eventSetBlockState = false;
     public static void eventSetBlockState(CallbackInfoReturnable<Boolean> info, World sender, BlockPos pos, IBlockState state) {
     	if (!eventSetBlockState && blockEventHandlers.size() > 0) {
-    		if (sender.isValid(pos)) {
+    		if (((IWorld)sender).isCoordValid(pos)) {
 	    		IBlockState old = sender.getBlockState(pos);
 	    		if (!old.equals(state)) {
 	    			BlockEventArgs args = new BlockEventArgs(old, state);
@@ -131,9 +131,9 @@ public class EventHandler {
     
     public static void eventTryHarvestBlock(PlayerInteractionManager sender, CallbackInfoReturnable<Boolean> info, BlockPos pos) {
     	if (info.getReturnValue() && blockEventHandlers.size() > 0) {
-    		World w = sender.theWorld;
+    		World w = sender.world;
     		IBlockState state = w.getBlockState(pos);
-    		blockEventHandlers.all().onBreakBlock(sender.thisPlayerMP, w, state, pos, EnumHand.MAIN_HAND);
+    		blockEventHandlers.all().onBreakBlock(sender.player, w, state, pos, EnumHand.MAIN_HAND);
     	}
     }
     
@@ -186,13 +186,11 @@ public class EventHandler {
     public static void initEntity(Entity sender, World w) {
     	if (!(sender instanceof EntityPlayer)) {
 	    	entityEventHandlers.all().onEntityConstructed(sender);
-	    	EntityPropertyManager.instance().entityinit(sender);
     	}
     }
     
     public static void initEntityPlayer(EntityPlayer sender, World w, GameProfile profile) {
     	entityEventHandlers.all().onEntityConstructed(sender);
-    	EntityPropertyManager.instance().entityinit(sender);
     }
     
     public static void eventCollideWithPlayer(EntityPlayer sender, CallbackInfo info, Entity entity) {
@@ -202,18 +200,18 @@ public class EventHandler {
     }
     
     public static void eventDoBlockCollisions(Object sender) {
-    	if (playerEventHandlers.size() > 0 && sender instanceof EntityPlayer) {
+    	if (playerEventHandlers.size() > 0) {
     		EntityPlayer player = (EntityPlayer)sender;
     		if (player.isEntityAlive() && !player.isPlayerSleeping() && !player.noClip) {
 	    		BlockPos var1 = new BlockPos(player.getEntityBoundingBox().minX + 0.001D, player.getEntityBoundingBox().minY + 0.001D, player.getEntityBoundingBox().minZ + 0.001D);
 	            BlockPos var2 = new BlockPos(player.getEntityBoundingBox().maxX - 0.001D, player.getEntityBoundingBox().maxY - 0.001D, player.getEntityBoundingBox().maxZ - 0.001D);
-	            if (player.worldObj.isAreaLoaded(var1, var2)) {
+	            if (player.getEntityWorld().isAreaLoaded(var1, var2)) {
 	                for (int var3 = var1.getX(); var3 <= var2.getX(); ++var3) {
 	                    for (int var4 = var1.getY(); var4 <= var2.getY(); ++var4) {
 	                        for (int var5 = var1.getZ(); var5 <= var2.getZ(); ++var5) {
 	                            BlockPos pos = new BlockPos(var3, var4, var5);
-	                            IBlockState state = player.worldObj.getBlockState(pos);
-	                            if (state.getBlock().isVisuallyOpaque()) {
+	                            IBlockState state = player.getEntityWorld().getBlockState(pos);
+	                            if (state.isOpaqueCube()) {
 	                            	playerEventHandlers.all().onPlayerCollideWithBlock(state, pos, player);
 	                            }
 	                        }
@@ -256,21 +254,21 @@ public class EventHandler {
     
     public static void eventUpdateEquipmentIfNeeded(EntityLiving sender, CallbackInfo info, EntityItem entityItem) {
     	if (inventoryEventHandlers.size() > 0) {
-	    	ItemStack pickedUp = entityItem.getEntityItem();
+	    	ItemStack pickedUp = entityItem.getItem();
 	    	InventoryEventArgs args = new InventoryEventArgs(pickedUp);
 	    	inventoryEventHandlers.all().onEntityEquipItem(sender, entityItem, args);
 	    	if (args.isCancelled()) {
 	    		info.cancel();
 	    	} else {
 	    		if (args.isDirty()) {
-	    			entityItem.setEntityItemStack(args.getItemStack());
+	    			entityItem.setItem(args.getItemStack());
 	    		}
 	    	}
     	}
     }
     
     public static void eventEntityDropItem(Entity sender, CallbackInfoReturnable<EntityItem> info, ItemStack droppedItem, float yOffset) {
-    	if (!isInEvent && droppedItem != null && droppedItem.stackSize > 0) {
+    	if (!isInEvent && droppedItem != null && droppedItem.getCount() > 0) {
     		if (inventoryEventHandlers.size() > 0) {
 	    		InventoryEventArgs args = new InventoryEventArgs(droppedItem);
 	    		inventoryEventHandlers.all().onDropItem(sender, false, false, args);
@@ -291,7 +289,7 @@ public class EventHandler {
     private static ItemStack savedHeldItemStack;
     public static void eventDropItem(EntityPlayer sender, CallbackInfoReturnable<EntityItem> info, ItemStack droppedItem, boolean dropAround, boolean traceItem) {
     	savedHeldItemStack = null;
-    	if (!isInEvent && droppedItem != null && droppedItem.stackSize > 0) {
+    	if (!isInEvent && droppedItem != null && droppedItem.getCount() > 0) {
     		if (inventoryEventHandlers.size() > 0) {
 	    		ItemStack held = sender.inventory.getItemStack();
 	    		InventoryEventArgs args = new InventoryEventArgs(droppedItem);
@@ -300,7 +298,7 @@ public class EventHandler {
 		    		info.setReturnValue(null);
 		    		if (held != null) {
 			    		if (!held.equals(droppedItem)) {
-			    			held.stackSize += droppedItem.stackSize;
+			    			held.setCount(held.getCount() + droppedItem.getCount());
 			    		} else {
 			    			savedHeldItemStack = held;
 			    		}
@@ -317,7 +315,7 @@ public class EventHandler {
     }
     
     //Now we then have to put the item back
-    public static void eventSlotClick(CallbackInfoReturnable info, EntityPlayer player) {
+    public static void eventSlotClick(CallbackInfoReturnable<?> info, EntityPlayer player) {
     	if (savedHeldItemStack != null) {
 	    	if (info.getReturnValue() == null && player.inventory.getItemStack() == null) {
 	    		player.inventory.setItemStack(savedHeldItemStack);
@@ -330,7 +328,7 @@ public class EventHandler {
     	if (inventoryEventHandlers.size() > 0) {
 	    	ItemStack droppedItem = sender.inventory.getCurrentItem().copy();
 	    	if (droppedItem != null) {
-		    	if (!dropAll) droppedItem.stackSize = 1;
+		    	if (!dropAll) droppedItem.setCount(1);
 		    	InventoryEventArgs args = new InventoryEventArgs(droppedItem);
 		    	inventoryEventHandlers.all().onDropOneItem(sender, dropAll, args);
 		    	if (args.isCancelled()) {
@@ -338,7 +336,7 @@ public class EventHandler {
 		    	}
 		    	if (args.isDirty()) {
 		    		info.setReturnValue(sender.dropItem(args.getItemStack(), false, true));
-		    		sender.inventory.decrStackSize(sender.inventory.currentItem, droppedItem.stackSize);
+		    		sender.inventory.decrStackSize(sender.inventory.currentItem, droppedItem.getCount());
 		    	}
 	    	}
     	}
@@ -365,19 +363,19 @@ public class EventHandler {
     	if (inventoryEventHandlers.size() > 0) {
 	    	MinecraftServer server = ApiServer.getServer();
 	    	Entity owner = null;
-	    	for (WorldServer i : server.worldServers) {
+	    	for (WorldServer i : server.worlds) {
 	    		owner = i.getEntityByID(entityId);
 	    		if (owner != null) break;
 	    	}
 	    	Entity item = null;
-	    	for (WorldServer i : server.worldServers) {
+	    	for (WorldServer i : server.worlds) {
 	    		item = i.getEntityByID(itemId);
 	    		if (item != null) break;
 	    	}
 	    	if (item != null && owner != null) {
 	    		int amount = 1;
 	    		if (item instanceof EntityItem) {
-	    			amount = ((EntityItem)item).getEntityItem().stackSize;
+	    			amount = ((EntityItem)item).getItem().getCount();
 	    		}
 	    		inventoryEventHandlers.all().onItemPickup(owner, item, amount);
 	    	}

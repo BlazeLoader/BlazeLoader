@@ -1,10 +1,9 @@
 package com.blazeloader.api.particles;
 
-import net.minecraft.client.particle.EntityParticleEmitter;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 
-public class ParticleEmitter extends EntityParticleEmitter {
+public class ParticleEmitter extends net.minecraft.client.particle.ParticleEmitter {
 
 	private Entity entity;
 	private ParticleData particle;
@@ -28,7 +27,7 @@ public class ParticleEmitter extends EntityParticleEmitter {
                 double x = entity.posX + vX * entity.width/4;
                 double y = entity.getEntityBoundingBox().minY + entity.height/2 + vY * entity.height/4;
                 double z = entity.posZ + vZ * entity.width/4;
-                ApiParticles.spawnParticle(particle.setPos(x, y, z).setVel(vX, vY + 0.2D, vZ), worldObj);
+                ApiParticles.spawnParticle(particle.setPos(x, y, z).setVel(vX, vY + 0.2D, vZ), world);
             }
         }
         if (++age >= maxAge) setExpired();

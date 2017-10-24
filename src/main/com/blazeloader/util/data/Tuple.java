@@ -15,49 +15,49 @@ public interface Tuple {
 	 * Factory method to create a one item Tuple.
 	 */
 	public static <T> Tuple1<T> create(T one) {
-		return new Tuple1(one);
+		return new Tuple1<T>(one);
 	}
 	
 	/**
 	 * Factory method to create a two item Tuple.
 	 */
 	public static <T, U> Tuple2<T, U> create(T one, U two) {
-		return new Tuple2(one, two);
+		return new Tuple2<T, U>(one, two);
 	}
 	
 	/**
 	 * Factory method to create a three item Tuple.
 	 */
 	public static <T, U, V> Tuple3<T, U, V> create(T one, U two, V three) {
-		return new Tuple3(one, two, three);
+		return new Tuple3<T, U, V>(one, two, three);
 	}
 	
 	/**
 	 * Factory method to create a four item Tuple.
 	 */
 	public static <T, U, V, W> Tuple4<T, U, V, W> create(T one, U two, V three, W four) {
-		return new Tuple4(one, two, three, four);
+		return new Tuple4<T, U, V, W>(one, two, three, four);
 	}
 	
 	/**
 	 * Factory method to create a five item Tuple.
 	 */
 	public static <T, U, V, W, X> Tuple5<T, U, V, W, X> create(T one, U two, V three, W four, X five) {
-		return new Tuple5(one, two, three, four, five);
+		return new Tuple5<T, U, V, W, X>(one, two, three, four, five);
 	}
 	
 	/**
 	 * Factory method to create a six item Tuple.
 	 */
 	public static <T, U, V, W, X, Y> Tuple6<T, U, V, W, X, Y> create(T one, U two, V three, W four, X five, Y six) {
-		return new Tuple6(one, two, three, four, five, six);
+		return new Tuple6<T, U, V, W, X, Y>(one, two, three, four, five, six);
 	}
 	
 	/**
 	 * Factory method to create a seven item Tuple.
 	 */
 	public static <T, U, V, W, X, Y, Z> Tuple7<T, U, V, W, X, Y, Z> create(T one, U two, V three, W four, X five, Y six, Z seven) {
-		return new Tuple7(one, two, three, four, five, six, seven);
+		return new Tuple7<T, U, V, W, X, Y, Z>(one, two, three, four, five, six, seven);
 	}
 	
 	/**
@@ -67,17 +67,8 @@ public interface Tuple {
 		if (n.length > 7) {
 			return create(one, two, three, four, five, six, seven, create(n[0],n[1],n[2],n[3],n[4],n[5],n[6], ArrayUtils.subarray(n, 7, n.length)));
 		} else {
-			switch (n.length) {
-			case 1: return TupleN.create(one, two, three, four, five, six, seven, new Tuple1(n[0]));
-			case 2: return TupleN.create(one, two, three, four, five, six, seven, new Tuple2(n[0],n[1]));
-			case 3: return TupleN.create(one, two, three, four, five, six, seven, new Tuple3(n[0],n[1],n[2]));
-			case 4: return TupleN.create(one, two, three, four, five, six, seven, new Tuple4(n[0],n[1],n[2],n[3]));
-			case 5: return TupleN.create(one, two, three, four, five, six, seven, new Tuple5(n[0],n[1],n[2],n[3],n[4]));
-			case 6: return TupleN.create(one, two, three, four, five, six, seven, new Tuple6(n[0],n[1],n[2],n[3],n[4],n[5]));
-			case 7: return TupleN.create(one, two, three, four, five, six, seven, new Tuple7(n[0],n[1],n[2],n[3],n[4],n[5],n[6]));
-			}
+			return TupleN.create(one, two, three, four, five, six, seven, n);
 		}
-		return null;
 	}
 	
 	public static class Tuple1<T> implements Tuple {
@@ -99,7 +90,7 @@ public interface Tuple {
 		}
 		
 		public boolean contentEquals(Tuple other) {
-			return getClass().isAssignableFrom(other.getClass()) && itemOne.equals(((Tuple1)other).itemOne);
+			return getClass().isAssignableFrom(other.getClass()) && itemOne.equals(((Tuple1<?>)other).itemOne);
 		}
 	}
 	
@@ -120,7 +111,7 @@ public interface Tuple {
 		}
 		
 		public boolean contentEquals(Tuple other) {
-			return super.contentEquals(other) && itemTwo.equals(((Tuple2)other).itemTwo);
+			return super.contentEquals(other) && itemTwo.equals(((Tuple2<?, ?>)other).itemTwo);
 		}
 	}
 	
@@ -140,7 +131,7 @@ public interface Tuple {
 		}
 		
 		public boolean contentEquals(Tuple other) {
-			return super.contentEquals(other) && itemThree.equals(((Tuple3)other).itemThree);
+			return super.contentEquals(other) && itemThree.equals(((Tuple3<?, ?, ?>)other).itemThree);
 		}
 	}
 	
@@ -160,7 +151,7 @@ public interface Tuple {
 		}
 		
 		public boolean contentEquals(Tuple other) {
-			return super.contentEquals(other) && itemFour.equals(((Tuple4)other).itemFour);
+			return super.contentEquals(other) && itemFour.equals(((Tuple4<?, ?, ?, ?>)other).itemFour);
 		}
 	}
 	
@@ -180,7 +171,7 @@ public interface Tuple {
 		}
 		
 		public boolean contentEquals(Tuple other) {
-			return super.contentEquals(other) && itemFive.equals(((Tuple5)other).itemFive);
+			return super.contentEquals(other) && itemFive.equals(((Tuple5<?, ?, ?, ?, ?>)other).itemFive);
 		}
 	}
 	
@@ -200,7 +191,7 @@ public interface Tuple {
 		}
 		
 		public boolean contentEquals(Tuple other) {
-			return super.contentEquals(other) && itemSix.equals(((Tuple6)other).itemSix);
+			return super.contentEquals(other) && itemSix.equals(((Tuple6<?, ?, ?, ?, ?, ?>)other).itemSix);
 		}
 	}
 	
@@ -220,7 +211,7 @@ public interface Tuple {
 		}
 		
 		public boolean contentEquals(Tuple other) {
-			return super.contentEquals(other) && itemSix.equals(((Tuple7)other).itemSeven);
+			return super.contentEquals(other) && itemSix.equals(((Tuple7<?, ?, ?, ?, ?, ?, ?>)other).itemSeven);
 		}
 	}
 	
@@ -240,11 +231,26 @@ public interface Tuple {
 		}
 		
 		public boolean contentEquals(Tuple other) {
-			return super.contentEquals(other) && extended.contentEquals(((TupleN)other).extended);
+			return super.contentEquals(other) && extended.contentEquals(((TupleN<?, ?, ?, ?, ?, ?, ?, ?>)other).extended);
 		}
 		
-		protected static <T, U, V, W, X, Y, Z, N extends Tuple> TupleN<T, U, V, W, X, Y, Z, N> create(T one, U two, V three, W four, X five, Y six, Z seven, Tuple n) {
-			return new TupleN(one, two, three, four, five, six, seven, n);
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		private static Tuple createNthTuple(Object[] n) {
+			switch (n.length) {
+				case 1: return new Tuple1(n[0]);
+				case 2: return new Tuple2(n[0],n[1]);
+				case 3: return new Tuple3(n[0],n[1],n[2]);
+				case 4: return new Tuple4(n[0],n[1],n[2],n[3]);
+				case 5: return new Tuple5(n[0],n[1],n[2],n[3],n[4]);
+				case 6: return new Tuple6(n[0],n[1],n[2],n[3],n[4],n[5]);
+				case 7: return new Tuple7(n[0],n[1],n[2],n[3],n[4],n[5],n[6]);
+			}
+			return null;
+		}
+		
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		protected static <T, U, V, W, X, Y, Z, N extends Tuple> TupleN<T, U, V, W, X, Y, Z, N> create(T one, U two, V three, W four, X five, Y six, Z seven, Object[] n) {
+			return new TupleN(one, two, three, four, five, six, seven, createNthTuple(n));
 		}
 	}
 }

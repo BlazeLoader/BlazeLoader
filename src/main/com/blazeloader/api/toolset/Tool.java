@@ -4,6 +4,7 @@ import java.util.Set;
 
 import com.google.common.collect.Multimap;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -17,7 +18,7 @@ public abstract class Tool extends ItemTool implements ITool {
 	
 	private final float damageValue;
 	
-	protected Tool(float attackDamage, float speed, ToolsetAttributes attributes, Set effectiveBlocks) {
+	protected Tool(float attackDamage, float speed, ToolsetAttributes attributes, Set<Block> effectiveBlocks) {
 		super(speed, attackDamage, ToolMaterial.WOOD, effectiveBlocks);
 		this.attributes = attributes;
 		this.damageValue = attackDamage;

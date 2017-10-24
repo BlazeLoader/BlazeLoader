@@ -57,7 +57,7 @@ public class Downloader {
 			try {
 				returnCachedData(callback);
 			} catch (IOException e) {
-				BLMain.LOGGER_MAIN.logError("Couldn\'t open cached resource file", e);
+				BLMain.LOGGER_FULL.error("Couldn\'t open cached resource file", e);
 			}
 			return;
 		}
@@ -98,7 +98,7 @@ public class Downloader {
                     	input.close();
                     }
                 } catch (Exception e) {
-                    BLMain.LOGGER_MAIN.logError("Couldn\'t download http resource", e);
+                    BLMain.LOGGER_FULL.error("Couldn\'t download http resource", e);
                 } finally {
                     if (connection != null) connection.disconnect();
                 }

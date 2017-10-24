@@ -8,7 +8,7 @@ import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.EntityTrackerEntry;
 import net.minecraft.network.Packet;
 
-public class BasicTrack<T extends Entity> implements ITrack {
+public class BasicTrack<T extends Entity> implements ITrack<T> {
 	
 	private final int range;
 	private final int frequency;
@@ -21,11 +21,10 @@ public class BasicTrack<T extends Entity> implements ITrack {
 	}
 	
 	public void addEntityToTracker(EntityTracker entityTracker, Entity entity) {
-		entityTracker.addEntityToTracker(entity, range, frequency, velocity);
+		entityTracker.track(entity, range, frequency, velocity);
 	}
 	
-	public Packet getEntitySpawnPacket(EntityTrackerEntry entry) {
-		//func_151260_c()
+	public Packet<?> getEntitySpawnPacket(EntityTrackerEntry entry) {
         return BLPacketChannels.instance().getRawPacket(new BLPacketSpawnObject.Message(entry.getTrackedEntity(), 1));
 	}
 }

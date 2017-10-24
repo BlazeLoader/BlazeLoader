@@ -11,7 +11,7 @@ import com.google.common.collect.Lists;
  * Class containing the implementation details for a version's numberic component
  *
  */
-public class VersionNumber<T extends Version> {
+public class VersionNumber<T extends Version<T>> {
 	private final int versionDepth;
 	
 	protected final Integer[] versionParts;
@@ -89,7 +89,7 @@ public class VersionNumber<T extends Version> {
     
     @Override
     public boolean equals(Object other) {
-    	return other == this || (other instanceof VersionNumber && ((VersionNumber)other).versionParts == versionParts);
+    	return other == this || (other instanceof VersionNumber && ((VersionNumber<?>)other).versionParts == versionParts);
     }
     
     @Override

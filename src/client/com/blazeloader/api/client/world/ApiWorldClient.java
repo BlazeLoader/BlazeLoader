@@ -14,7 +14,7 @@ public class ApiWorldClient {
     public static String getCurrentWorldName() {
         if (ApiGeneral.isClient()) {
             Minecraft mc = Minecraft.getMinecraft();
-            if (mc.theWorld != null) {
+            if (mc.world != null) {
                 if (mc.isIntegratedServerRunning()) {
                     return mc.getIntegratedServer().getWorldName(); //Client with a Singleplayer world
                 } else {

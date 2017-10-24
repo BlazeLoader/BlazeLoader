@@ -8,22 +8,22 @@ import net.minecraft.item.ItemDye;
 public class MCColor {
 	
     public static final MCColor
-            DYE_BLACK = new MCColor(ItemDye.dyeColors[0]),
-            DYE_RED = new MCColor(ItemDye.dyeColors[1]),
-            DYE_GREEN = new MCColor(ItemDye.dyeColors[2]),
-            DYE_BROWN = new MCColor(ItemDye.dyeColors[3]),
-            DYE_BLUE = new MCColor(ItemDye.dyeColors[4]),
-            DYE_PURPLE = new MCColor(ItemDye.dyeColors[5]),
-            DYE_CYAN = new MCColor(ItemDye.dyeColors[6]),
-            DYE_SILVER = new MCColor(ItemDye.dyeColors[7]),
-            DYE_GRAY = new MCColor(ItemDye.dyeColors[8]),
-            DYE_PINK = new MCColor(ItemDye.dyeColors[9]),
-            DYE_LIME = new MCColor(ItemDye.dyeColors[10]),
-            DYE_YELLOW = new MCColor(ItemDye.dyeColors[11]),
-            DYE_LIGHTBLUE = new MCColor(ItemDye.dyeColors[12]),
-            DYE_MAGENTA = new MCColor(ItemDye.dyeColors[13]),
-            DYE_ORANGE = new MCColor(ItemDye.dyeColors[14]),
-            DYE_WHITE = new MCColor(ItemDye.dyeColors[15]);
+            DYE_BLACK = new MCColor(ItemDye.DYE_COLORS[0]),
+            DYE_RED = new MCColor(ItemDye.DYE_COLORS[1]),
+            DYE_GREEN = new MCColor(ItemDye.DYE_COLORS[2]),
+            DYE_BROWN = new MCColor(ItemDye.DYE_COLORS[3]),
+            DYE_BLUE = new MCColor(ItemDye.DYE_COLORS[4]),
+            DYE_PURPLE = new MCColor(ItemDye.DYE_COLORS[5]),
+            DYE_CYAN = new MCColor(ItemDye.DYE_COLORS[6]),
+            DYE_SILVER = new MCColor(ItemDye.DYE_COLORS[7]),
+            DYE_GRAY = new MCColor(ItemDye.DYE_COLORS[8]),
+            DYE_PINK = new MCColor(ItemDye.DYE_COLORS[9]),
+            DYE_LIME = new MCColor(ItemDye.DYE_COLORS[10]),
+            DYE_YELLOW = new MCColor(ItemDye.DYE_COLORS[11]),
+            DYE_LIGHTBLUE = new MCColor(ItemDye.DYE_COLORS[12]),
+            DYE_MAGENTA = new MCColor(ItemDye.DYE_COLORS[13]),
+            DYE_ORANGE = new MCColor(ItemDye.DYE_COLORS[14]),
+            DYE_WHITE = new MCColor(ItemDye.DYE_COLORS[15]);
 
     public static final MCColor
             BRUSHES_ALICEBLUE = new MCColor(15792383),

@@ -35,9 +35,10 @@ public class StringableArray<T> implements IWrapObject<T[]> {
 		array = arr;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void fromString(T[] def, String value) {
 		try {
-			array = (T[])gson.fromJson(value, def.getClass());
+			array = gson.fromJson(value, (Class<T[]>)def.getClass());
 		} catch (Throwable e) {
 			e.printStackTrace();
 			array = def;

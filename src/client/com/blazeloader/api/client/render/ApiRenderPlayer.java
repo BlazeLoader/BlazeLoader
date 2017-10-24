@@ -3,8 +3,9 @@ package com.blazeloader.api.client.render;
 import java.util.Map;
 
 import com.blazeloader.api.client.ApiClient;
+import com.blazeloader.event.mixin.client.MRenderManager;
 
-import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -80,7 +81,7 @@ public class ApiRenderPlayer {
 	 * @return	A player renderer for the given player
 	 */
 	public static RenderPlayer getPlayerRenderer(EntityPlayer player) {
-		return (RenderPlayer)(Render)ApiClient.getRenderManager().getEntityRenderObject(player);
+		return (RenderPlayer)ApiClient.getRenderManager().<AbstractClientPlayer>getEntityRenderObject(player);
 	}
 	
 	/**
@@ -104,6 +105,6 @@ public class ApiRenderPlayer {
 	}
 	
 	private static Map<String, RenderPlayer> skinMap() {
-		return ApiClient.getRenderManager().skinMap;
+		return ((MRenderManager)ApiClient.getRenderManager()).getSkinMap();
 	}
 }

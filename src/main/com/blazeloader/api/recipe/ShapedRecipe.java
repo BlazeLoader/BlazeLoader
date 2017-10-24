@@ -2,16 +2,18 @@ package com.blazeloader.api.recipe;
 
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 
 public class ShapedRecipe extends ShapedRecipes {
 	
 	private int recipeWidth, recipeHeight;
-	protected ItemStack[] recipeItems;
+	protected NonNullList<Ingredient> recipeItems;
 	
-	public ShapedRecipe(int width, int height, ItemStack[] input, ItemStack output) {
-		super(width, height, input, output);
+	public ShapedRecipe(String group, int width, int height, NonNullList<Ingredient> input, ItemStack output) {
+		super(group, width, height, input, output);
 		recipeWidth = width;
 		recipeHeight = height;
 		recipeItems = input;
@@ -35,25 +37,18 @@ public class ShapedRecipe extends ShapedRecipes {
      */
     private boolean checkMatch(InventoryCrafting inventory, int x, int y, boolean flag) {
         for (int X = 0; X < inventory.getWidth(); X++) {
-            for (int Y = 0; Y < inventory.getHeight(); Y++) {
-                int var7 = X - x;
-                int var8 = Y - y;
-                ItemStack var9 = null;
+            for (int Y = 0; Y < inventory.getHeight(); ++Y) {
+                int k = X - x;
+                int l = Y - y;
+                Ingredient ingredient = Ingredient.EMPTY;
 
-                if (var7 >= 0 && var8 >= 0 && var7 < recipeWidth && var8 < recipeHeight)
-                {
-                    if (flag) {
-                        var9 = recipeItems[recipeWidth - var7 - 1 + var8 * recipeWidth];
-                    } else {
-                        var9 = recipeItems[var7 + var8 * recipeWidth];
-                    }
+                if (k >= 0 && l >= 0 && k < recipeWidth && l < recipeHeight) {
+                	int index = flag ? recipeWidth - k - 1 + l * recipeWidth : k + l * recipeWidth;
+                    ingredient = recipeItems.get(index);
                 }
-            	
-                ItemStack stack = inventory.getStackInRowAndColumn(X, Y);
-                if (stack != null || var9 != null) {
-                    if (stack == null || var9 == null) return false;
-                    if (var9.getItem() != stack.getItem()) return false;
-                    if (var9.getMetadata() != 32767 && var9.getMetadata() != stack.getMetadata()) return false;
+
+                if (!ingredient.apply(inventory.getStackInRowAndColumn(X, Y))) {
+                    return false;
                 }
             }
         }

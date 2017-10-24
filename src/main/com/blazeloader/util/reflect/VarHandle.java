@@ -17,7 +17,7 @@ public class VarHandle {
 	
 	protected final String declaringContext;
 	
-	public VarHandle(Class declarer, Class type, boolean isStatic, String name) {
+	public VarHandle(Class<?> declarer, Class<?> type, boolean isStatic, String name) {
 		staticField = isStatic;
 		declaringContext = declarer.getCanonicalName();
 		lookupVariable(declarer, type, name);
@@ -49,14 +49,14 @@ public class VarHandle {
 			returnType = returnType.substring(1, returnType.length() - 1).replace("/", ".");
 		}
 		
-		Class declarer = Interop.getDeclaredClass(className);
-		Class type = returnType.isEmpty() ? null : Interop.getDeclaredClass(returnType);
+		Class<?> declarer = Interop.getDeclaredClass(className);
+		Class<?> type = returnType.isEmpty() ? null : Interop.getDeclaredClass(returnType);
 		
 		declaringContext = className;
 		lookupVariable(declarer, type, fieldName);
 	}
 	
-	private void lookupVariable(Class declarer, Class type, String name) {
+	private void lookupVariable(Class<?> declarer, Class<?> type, String name) {
 		varName = name;
 		try {
 			MethodHandles.Lookup lookup = MethodHandles.lookup();

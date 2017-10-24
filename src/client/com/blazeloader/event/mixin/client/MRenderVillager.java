@@ -13,7 +13,7 @@ import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.util.ResourceLocation;
 
 @Mixin(RenderVillager.class)
-public abstract class MRenderVillager extends RenderLiving {
+public abstract class MRenderVillager extends RenderLiving<EntityVillager> {
 	public MRenderVillager() {super(null, null, -1);}
 	
 	@Inject(method = "getEntityTexture(Lnet/minecraft/entity/passive/EntityVillager;)Lnet/minecraft/util/ResourceLocation;", at = @At("HEAD"), cancellable = true)

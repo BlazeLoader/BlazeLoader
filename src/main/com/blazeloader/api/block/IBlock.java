@@ -25,6 +25,8 @@ import net.minecraft.world.World;
 /**
  * Default implementations for the block class.
  * 
+ * These are separated from the primary mixin so they may be overridden higher up by forge methods.
+ * 
  * Not to be used directly.
  */
 public interface IBlock extends IRotateable, ISided {
@@ -35,6 +37,7 @@ public interface IBlock extends IRotateable, ISided {
 		return rotation != null && rotateBlockTo(world, pos, state, rotation.rotateAround(axis.getAxis()));
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public default boolean rotateBlockTo(World w, BlockPos pos, IBlockState state, EnumFacing facing) {
 		if (this instanceof BlockLever) {
 			w.setBlockState(pos, state.withProperty(BlockLever.FACING, EnumOrientation.forFacings(facing, EnumFacing.NORTH)));
@@ -54,7 +57,7 @@ public interface IBlock extends IRotateable, ISided {
 		}
 		for (IProperty i : state.getProperties().keySet()) {
 			if (i instanceof PropertyEnum || i.getValueClass() == EnumFacing.class) {
-				Collection allowedValues = Lists.newArrayList(i.getAllowedValues());
+				Collection<EnumFacing> allowedValues = (Collection<EnumFacing>)Lists.newArrayList(i.getAllowedValues());
 				if (allowedValues.contains(facing)) {
 					w.setBlockState(pos, state.withProperty(i, facing));
 					return true;
@@ -65,6 +68,7 @@ public interface IBlock extends IRotateable, ISided {
 		return false;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public default EnumFacing[] getValidRotations(World world, BlockPos pos) {
 		if (this instanceof BlockLever || this instanceof BlockRotatedPillar) {
 			return EnumFacing.values();
@@ -72,9 +76,9 @@ public interface IBlock extends IRotateable, ISided {
 		if (this instanceof BlockSlab) {
 			return EnumFacing.Plane.VERTICAL.facings();
 		}
-		for (IProperty i : world.getBlockState(pos).getProperties().keySet()) {
+		for (IProperty<?> i : world.getBlockState(pos).getProperties().keySet()) {
 			if (i instanceof PropertyEnum || i.getValueClass() == EnumFacing.class) {
-				Collection<EnumFacing> result = i.getAllowedValues();
+				Collection<EnumFacing> result = (Collection<EnumFacing>)i.getAllowedValues();
 				return result.toArray(new EnumFacing[result.size()]);
 			}
 		}
@@ -99,14 +103,14 @@ public interface IBlock extends IRotateable, ISided {
         Block block = (Block)this;
         
 		if (side == EnumFacing.UP) {
-			return state.isFullyOpaque();
+			return state.isTopSolid();
 		}
 		if (side == EnumFacing.DOWN) {
 			if (block instanceof BlockStairs) {
-				return !state.isFullyOpaque();
+				return !state.isTopSolid();
 			}
 			if (block instanceof BlockSlab) {
-				return ((BlockSlab)state.getBlock()).isDouble() || !state.isFullyOpaque();
+				return ((BlockSlab)state.getBlock()).isDouble() || !state.isTopSolid();
 			}
 			if (block instanceof BlockHopper) return true;
 		}

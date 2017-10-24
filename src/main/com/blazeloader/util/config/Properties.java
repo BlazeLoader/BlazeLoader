@@ -3,8 +3,9 @@ package com.blazeloader.util.config;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -31,6 +32,7 @@ public class Properties implements IConfig {
 		if (file != null) load(file);
 	}
 	
+	@Override
 	public void load(File file) {
 		if (file.exists() && !(file.canRead() && file.isFile())) {
 			throw new IllegalArgumentException("Given file is not a file or is not accessible.");
@@ -38,7 +40,7 @@ public class Properties implements IConfig {
 		this.file = file;
 		try {
 			if (file.exists()) {
-				List<String> lines = FileUtils.readLines(file);
+				List<String> lines = FileUtils.readLines(file, Charset.defaultCharset());
 				readFrom(lines);
 			} else {
 				file.createNewFile();
@@ -48,6 +50,7 @@ public class Properties implements IConfig {
 		}
 	}
 	
+	@Override
 	public void save() {
 		try {
 			FileWriter writer = new FileWriter(file);
@@ -63,6 +66,7 @@ public class Properties implements IConfig {
 		return this;
 	}
 	
+	@Override
 	public boolean getWriteDefaults() {
 		return writeDefaults;
 	}
@@ -71,6 +75,7 @@ public class Properties implements IConfig {
 		return sections.containsKey(section);
 	}
 	
+	@Override
 	public boolean has(String section, String name) {
 		if (hasSection(section)) {
 			return sections.get(section).has(name);
@@ -78,6 +83,7 @@ public class Properties implements IConfig {
 		return false;
 	}
 	
+	@Override
 	public <T> Prop<T> getProperty(String section, String name, T defaultValue) {
 		return getSection(section).get(name, defaultValue);
 	}
@@ -151,7 +157,7 @@ public class Properties implements IConfig {
 		return result;
 	}
 	
-	
+	@Override
 	public Section getSection(String section) {
 		if (hasSection(section)) {
 			return sections.get(section);
@@ -170,7 +176,6 @@ public class Properties implements IConfig {
 		writer.append(builder.toString());
 	}
 	
-	
 	protected void readFrom(List<String> lines) {
 		while (lines.size() > 0) {
 			try {
@@ -184,14 +189,17 @@ public class Properties implements IConfig {
 		}
 	}
 	
+	@Override
 	public String applyNameRegexString(String name) {
 		return name.replaceAll("<|>|\t(\t)*|\n(\n)*|\r(\r)*| ", "_");
 	}
 	
+	@Override
 	public String applyDescriptionRegexString(String description) {
 		return description.replaceAll("\t(\t)*", " ");
 	}
 	
+	@Override
 	public String popNextLine(List<String> lines) {
 		String next = "";
  		do {
@@ -200,6 +208,7 @@ public class Properties implements IConfig {
  		return next;
 	}
 	
+	@Override
 	public String popNextValue(List<String> lines) {
 		int quote_type = -1;
 		int arrays_open = 0;
@@ -229,7 +238,9 @@ public class Properties implements IConfig {
 		return result.trim();
 	}
 	
-	public Iterator<IPropertyGroup> iterator() {
-		return (Iterator<IPropertyGroup>)(Object)sections.values().iterator();
+	@Override
+	@SuppressWarnings("unchecked")
+	public Collection<Section> values() {
+		return sections.values();
 	}
 }

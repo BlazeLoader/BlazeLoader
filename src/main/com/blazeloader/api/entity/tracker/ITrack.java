@@ -25,5 +25,5 @@ public interface ITrack<T extends Entity> {
 	 * @param entry		The entity we are tracking
 	 * @return A packet to spawn that entity.
 	 */
-	public Packet getEntitySpawnPacket(EntityTrackerEntry entry);
+	public Packet<?> getEntitySpawnPacket(EntityTrackerEntry entry);
 }

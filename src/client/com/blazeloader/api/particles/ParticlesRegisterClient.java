@@ -2,16 +2,16 @@ package com.blazeloader.api.particles;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.EntityDiggingFX;
-import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.particle.IParticleFactory;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleDigging;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
+import net.minecraft.crash.ICrashReportDetail;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
@@ -36,8 +36,9 @@ public class ParticlesRegisterClient extends ParticlesRegister<IParticleFactory>
 		super();
 	}
 	
-	public static ParticlesRegisterClient instance() {
-		return (ParticlesRegisterClient)ParticlesRegister.instance();
+	@SuppressWarnings("unchecked")
+	public static ParticlesRegister<IParticleFactory> instance() {
+		return ParticlesRegister.instance();
 	}
 	
 	@Override
@@ -46,7 +47,7 @@ public class ParticlesRegisterClient extends ParticlesRegister<IParticleFactory>
 	}
 	
 	@Override
-	public Map<Integer, IParticleFactory> init(Map<Integer, IParticleFactory> mapping) {
+	public void init(Map<Integer, IParticleFactory> mapping) {
 		if (vanillaRegistry == null || !vanillaRegistry.equals(mapping)) {
 			vanillaRegistry = mapping;
 			Iterator<IParticle> types = particlesRegistry.iterator();
@@ -67,7 +68,6 @@ public class ParticlesRegisterClient extends ParticlesRegister<IParticleFactory>
 				}
 			}
 		}
-		return vanillaRegistry;
 	}
 	
 	@Override
@@ -87,7 +87,7 @@ public class ParticlesRegisterClient extends ParticlesRegister<IParticleFactory>
 	
 	@Override
 	public void spawnParticleEmitter(Entity e, ParticleData particle) {
-		addEffectToRenderer(new ParticleEmitter(e.worldObj, e, particle));
+		addEffectToRenderer(new ParticleEmitter(e.getEntityWorld(), e, particle));
 	}
 	
 	@Override
@@ -100,7 +100,7 @@ public class ParticlesRegisterClient extends ParticlesRegister<IParticleFactory>
 			if (view != null) {
 	            int particleSetting = mc.gameSettings.particleSetting;
 	
-	            if (particleSetting == 1 && mc.theWorld.rand.nextInt(3) == 0) {
+	            if (particleSetting == 1 && mc.world.rand.nextInt(3) == 0) {
 	            	particleSetting = 2;
 	            }
 	            
@@ -124,7 +124,7 @@ public class ParticlesRegisterClient extends ParticlesRegister<IParticleFactory>
     }
     
     private void spawnCustomParticle(ParticleData particle, IParticleFactory factory, World world) {
-    	addEffectToRenderer(factory.getEntityFX(particle.getType().getId(), world, particle.posX, particle.posY, particle.posZ, particle.velX, particle.velY, particle.velZ, particle.getArgs()));
+    	addEffectToRenderer(factory.createParticle(particle.getType().getId(), world, particle.posX, particle.posY, particle.posZ, particle.velX, particle.velY, particle.velZ, particle.getArgs()));
     }
     
     private void reportParticleError(Throwable e, IParticleFactory factory, IParticle particle, final double x, final double y, final double z, int[] args) {
@@ -134,7 +134,7 @@ public class ParticlesRegisterClient extends ParticlesRegister<IParticleFactory>
     	category.addCrashSection("Particle Factory Class", factory == null ? "Null" : factory.getClass().toString());
     	
         if (args != null && args.length > 0) category.addCrashSection("Parameters", args);
-        category.addCrashSectionCallable("Position", new Callable() {
+        category.addDetail("Position", new ICrashReportDetail<String>() {
             public String call() {
                 return CrashReportCategory.getCoordinateInfo(x, y, z);
             }
@@ -144,8 +144,8 @@ public class ParticlesRegisterClient extends ParticlesRegister<IParticleFactory>
     
     @Override
     public void addEffectToRenderer(Object fx) {
-    	if (fx != null && fx instanceof EntityFX) {
-    		ApiClient.getEffectRenderer().addEffect((EntityFX)fx);
+    	if (fx != null && fx instanceof Particle) {
+    		ApiClient.getEffectRenderer().addEffect((Particle)fx);
     	}
     }
     
@@ -158,8 +158,8 @@ public class ParticlesRegisterClient extends ParticlesRegister<IParticleFactory>
     	addEffectToRenderer(buildDiggingEffect(w, x, y, z, vX, vY, vZ, blockState).setBlockPos(new BlockPos((int)x, (int)y, (int)z)).multiplyVelocity(multScale).multipleParticleScaleBy(multVel));
     }
     
-    protected EntityDiggingFX buildDiggingEffect(World w, double x, double y, double z, double vX, double vY, double vZ, IBlockState blockState) {
-    	return (EntityDiggingFX)(new EntityDiggingFX.Factory()).getEntityFX(EnumParticleTypes.BLOCK_CRACK.getParticleID(), w, x, y, z, vX, vY, vZ, Block.getStateId(blockState));
+    protected ParticleDigging buildDiggingEffect(World w, double x, double y, double z, double vX, double vY, double vZ, IBlockState blockState) {
+    	return (ParticleDigging)(new ParticleDigging.Factory()).createParticle(EnumParticleTypes.BLOCK_CRACK.getParticleID(), w, x, y, z, vX, vY, vZ, Block.getStateId(blockState));
     }
     
     @Override
@@ -172,7 +172,7 @@ public class ParticlesRegisterClient extends ParticlesRegister<IParticleFactory>
     		try {
     			spawnParticle(particle, w);
     		} catch (Throwable e) {
-    			BLMain.LOGGER_MAIN.logWarning("Could not spawn particle effect " + p.getType().getName());
+    			BLMain.LOGGER_FULL.warn("Could not spawn particle effect " + p.getType().getName());
     		}
     	} else {
     		for (int i = 0; i < p.getCount(); i++) {
@@ -189,7 +189,7 @@ public class ParticlesRegisterClient extends ParticlesRegister<IParticleFactory>
                 try {
                 	spawnParticle(particle, w);
                 } catch (Throwable e) {
-                	BLMain.LOGGER_MAIN.logWarning("Could not spawn particle effect " + p.getType().getName());
+                	BLMain.LOGGER_FULL.warn("Could not spawn particle effect " + p.getType().getName());
                     return;
                 }
             }

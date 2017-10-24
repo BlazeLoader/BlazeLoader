@@ -15,15 +15,16 @@ public abstract class AbstractVersion<T extends AbstractVersion<T>> implements V
         
     protected final VersionNumber<T> versionNumber;
     
-    public AbstractVersion(String id, String name, BuildType buildType, int ... parts) {
+    @SuppressWarnings("unchecked")
+	public AbstractVersion(String id, String name, BuildType buildType, int ... parts) {
         this.id = id;
         this.name = name;
         this.buildType = buildType;
         Versions.addVersion(this);
-        versionNumber = new VersionNumber(this, parts);
+        versionNumber = new VersionNumber<T>((T)this, parts);
     }
     
-    protected AbstractVersion(AbstractVersion other) {
+    protected AbstractVersion(AbstractVersion<T> other) {
     	this.id = other.getID();
     	this.name = other.getName();
     	this.buildType = other.getBuildType();
@@ -49,13 +50,15 @@ public abstract class AbstractVersion<T extends AbstractVersion<T>> implements V
         return buildType;
     }
     
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public T setFormat(Function<VersionNumber<T>, String> func) {
     	versionNumber.setFormat(func);
     	return (T)this;
     }
     
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public T setComponentFormat(Function<VersionNumber<T>, String> func) {
     	versionNumber.setComponentFormat(func);
     	return (T)this;
@@ -88,7 +91,7 @@ public abstract class AbstractVersion<T extends AbstractVersion<T>> implements V
     
     @Override
     public boolean equals(Object other) {
-    	return other == this || ((other instanceof AbstractVersion) && ((AbstractVersion)other).versionNumber.equals(versionNumber));
+    	return other == this || ((other instanceof AbstractVersion) && ((AbstractVersion<?>)other).versionNumber.equals(versionNumber));
     }
     
     @Override

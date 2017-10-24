@@ -18,10 +18,10 @@ import com.mumfrey.liteloader.core.InterfaceRegistrationDelegate;
 
 public class BlazeLoaderInterfaceProvider implements InterfaceProvider {
 	
-	private static BlazeLoaderInterfaceProvider instance;
+	private static final BlazeLoaderInterfaceProvider instance = new BlazeLoaderInterfaceProvider();
 	
-	protected BlazeLoaderInterfaceProvider() {
-		instance = this;
+	private BlazeLoaderInterfaceProvider() {
+		
 	}
 	
 	protected static final BlazeLoaderInterfaceProvider instance() {

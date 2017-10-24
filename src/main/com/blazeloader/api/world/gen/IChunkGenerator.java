@@ -19,5 +19,5 @@ public interface IChunkGenerator {
      * @param chunkZ    Z coordinate of the chunk
      * @param seed        Random generator set to the chunk specific seed
      */
-    public void populateChunk(Chunk chunk, IChunkProvider provider, net.minecraft.world.chunk.IChunkGenerator generator, int chunkX, int chunkZ, Random seed);
+    public void populateChunk(Chunk chunk, IChunkProvider provider, net.minecraft.world.gen.IChunkGenerator generator, int chunkX, int chunkZ, Random seed);
 }

@@ -1,6 +1,8 @@
 package com.blazeloader.util.config;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -75,4 +77,11 @@ public interface IConfig extends Iterable<IPropertyGroup> {
 	 * Returns true if this IConfig allows writing @default annotations to property files.
 	 */
 	public boolean getWriteDefaults();
+	
+
+	public <I extends IPropertyGroup> Collection<I> values();
+	
+	public default Iterator<IPropertyGroup> iterator() {
+		return values().iterator();
+	}
 }

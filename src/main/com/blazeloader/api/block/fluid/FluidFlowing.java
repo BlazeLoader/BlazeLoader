@@ -20,16 +20,15 @@ public abstract class FluidFlowing extends BlockDynamicLiquid implements Fluid {
 	/**
 	 * Stops flowing and converts this block into it's static variant.
 	 */
-	@Override
-	protected void placeStaticBlock(World worldIn, BlockPos pos, IBlockState currentState) {
-        worldIn.setBlockState(pos, getStaticBlock().getDefaultState().withProperty(LEVEL, currentState.getValue(LEVEL)), 2);
+	public void stopFlowing(World w, BlockPos pos, IBlockState currentState) {
+        w.setBlockState(pos, getStaticBlock().getDefaultState().withProperty(LEVEL, currentState.getValue(LEVEL)), 2);
     }
 	
 	/**
 	 * Gets the direction in which this fluid is flowing.
 	 */
 	@Override
-	public Vec3d getFlowVector(IBlockAccess worldIn, BlockPos pos) {
-		return super.getFlowVector(worldIn, pos);
+	public Vec3d getFlow(IBlockAccess worldIn, BlockPos pos, IBlockState state) {
+		return super.getFlow(worldIn, pos, state);
 	}
 }

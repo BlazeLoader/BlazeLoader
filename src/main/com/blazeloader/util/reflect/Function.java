@@ -6,7 +6,7 @@ public abstract class Function<I, T, R> {
 	
 	protected final FuncHandle handle;
 	
-	protected Function(Class<T> interfaceType, Class<I> context, Class<R> returnType, String name, boolean isStatic, Class... pars) {
+	protected Function(Class<T> interfaceType, Class<I> context, Class<R> returnType, String name, boolean isStatic, Class<?>... pars) {
 		handle = new FuncHandle(interfaceType, context, returnType, name, isStatic, pars);
 	}
 	
@@ -18,7 +18,7 @@ public abstract class Function<I, T, R> {
 		handle = new FuncHandle(interfaceType, isStatic, descriptor);
 	}
 	
-	protected Function(Function<I, T,R> other) {
+	protected Function(Function<I, T, R> other) {
 		handle = other.handle;
 	}
 	
@@ -53,7 +53,6 @@ public abstract class Function<I, T, R> {
 	
 	/**
 	 * Checks if this function was created with an interface for constructing a lambda.
-	 * @return
 	 */
 	public boolean supportsLambda() {
 		return handle.supportsLambda();

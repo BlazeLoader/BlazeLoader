@@ -1,7 +1,6 @@
 package com.blazeloader.util.version;
 
 import com.blazeloader.bl.main.BLMain;
-import com.blazeloader.util.version.type.BasicVersion;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,8 +11,8 @@ import java.util.Map;
 public class Versions {
     private static final boolean isOBF = VersionUtils.isGameOBF();
     private static final boolean isForgeInstalled = VersionUtils.hasForge();
-    private static final Map<String, Version> versionMap = new HashMap<String, Version>();
-    private static final Version BL_VERSION = new BasicVersion("BlazeLoader.main", "BlazeLoader", BuildType.BETA, 1);
+    private static final Map<String, Version<?>> versionMap = new HashMap<String, Version<?>>();
+    
 
     /**
      * Detects if the game is obfuscated.
@@ -54,8 +53,8 @@ public class Versions {
     /**
      * Gets the version of blazeloader running on the current game
      */
-    public static Version getBLMainVersion() {
-        return BL_VERSION;
+    public static Version<?> getBLMainVersion() {
+        return BLMain.getVersion();
     }
     
     /**
@@ -65,7 +64,7 @@ public class Versions {
      * 
      * @return The associated version or null
      */
-    public static Version getVersionOf(String id) {
+    public static Version<?> getVersionOf(String id) {
         return versionMap.get(id);
     }
 
@@ -74,7 +73,7 @@ public class Versions {
      * 
      * @param version	The version to add.
      */
-    protected static void addVersion(Version version) {
+    protected static void addVersion(Version<?> version) {
         versionMap.put(version.getID(), version);
     }
     
@@ -93,7 +92,7 @@ public class Versions {
      * Checks if the given version is registered
      * 
      */
-    public static boolean isVersionRegistered(Version version) {
+    public static boolean isVersionRegistered(Version<?> version) {
         return isVersionRegistered(version.getID());
     }
 
