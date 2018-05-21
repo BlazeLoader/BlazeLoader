@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.blazeloader.api.ApiServer;
+import com.blazeloader.api.world.ApiWorld;
 import com.blazeloader.api.world.gen.UnpopulatedChunksQ;
 import com.blazeloader.api.privileged.IWorld;
 import com.blazeloader.event.listeners.*;
@@ -359,25 +360,13 @@ public class EventHandler {
     	}
     }
     
-    public static void initS0DPacketCollectItem(int itemId, int entityId) {
+    public static void initS0DPacketCollectItem(int itemId, int entityId, int quantity) {
     	if (inventoryEventHandlers.size() > 0) {
 	    	MinecraftServer server = ApiServer.getServer();
-	    	Entity owner = null;
-	    	for (WorldServer i : server.worlds) {
-	    		owner = i.getEntityByID(entityId);
-	    		if (owner != null) break;
-	    	}
-	    	Entity item = null;
-	    	for (WorldServer i : server.worlds) {
-	    		item = i.getEntityByID(itemId);
-	    		if (item != null) break;
-	    	}
-	    	if (item != null && owner != null) {
-	    		int amount = 1;
-	    		if (item instanceof EntityItem) {
-	    			amount = ((EntityItem)item).getItem().getCount();
-	    		}
-	    		inventoryEventHandlers.all().onItemPickup(owner, item, amount);
+	    	Entity item = ApiWorld.getEntityById(server, itemId);
+	    	if (item != null) {
+	    		Entity owner = ApiWorld.getEntityById(server, entityId);
+	    		if (owner != null) inventoryEventHandlers.all().onItemPickup(owner, item, quantity);
 	    	}
     	}
     }

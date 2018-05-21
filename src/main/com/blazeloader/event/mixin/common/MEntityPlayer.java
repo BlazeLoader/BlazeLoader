@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.blazeloader.event.handlers.EventHandler;
-import com.blazeloader.event.handlers.InternalEventHandler;
 import com.mojang.authlib.GameProfile;
 
 import net.minecraft.entity.Entity;
@@ -25,18 +24,13 @@ public abstract class MEntityPlayer extends EntityLivingBase {
 	private void onInit(World w, GameProfile profile, CallbackInfo info) {
 		EventHandler.initEntityPlayer((EntityPlayer)(Object)this, w, profile);
 	}
-
-	@Inject(method = "copyFrom(Lnet/minecraft/entity/player/EntityPlayer;Z)V", at = @At("RETURN"))
-	private void onClonePlayer(EntityPlayer old, boolean respawnedFromEnd, CallbackInfo info) {
-		InternalEventHandler.eventClonePlayer((EntityPlayer)(Object)this, old, respawnedFromEnd);
-	}
 	
 	@Inject(method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/item/EntityItem;", at = @At("HEAD"), cancellable = true)
 	private void onDropItem(ItemStack droppedItem, boolean dropAround, boolean traceItem, CallbackInfoReturnable<EntityItem> info) {
 		EventHandler.eventDropItem((EntityPlayer)(Object)this, info, droppedItem, dropAround, traceItem);
 	}
 	
-	@Inject(method = "dropOneItem(Z)Lnet/minecraft/entity/item/EntityItem;", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "dropItem(Z)Lnet/minecraft/entity/item/EntityItem;", at = @At("HEAD"), cancellable = true)
 	private void onDropOneItem(boolean dropAll, CallbackInfoReturnable<EntityItem> info) {
 		EventHandler.eventDropOneItem((EntityPlayer)(Object)this, info, dropAll);
 	}

@@ -20,8 +20,8 @@ public final class Reflect {
 	 * @param type		The type of values this field takes
 	 * @param name		The name of this field
 	 */
-	public static <T, V> Var<T, V> lookupField(Class<T> declarer, Class<V> type, String name) {
-		return new Var<T, V>(declarer, type, name);
+	public static <T, V> Var<T, V> lookupField(Class<T> declarer, Class<V> type, String name, String... aliases) {
+		return new Var<T, V>(declarer, type, name, aliases);
 	}
 	
 	/**
@@ -97,8 +97,8 @@ public final class Reflect {
 	/**
 	 * Finds a hook into a static field by a given BLOBF mapping.
 	 */
-	public static <T, V> Var<T, V> lookupStaticField(BLOBF obf) {
-		return new Var<T, V>(true, obf);
+	public static <T, V> StaticVar<T, V> lookupStaticField(BLOBF obf) {
+		return new StaticVar<T, V>(obf);
 	}
 	
 	/**
@@ -108,15 +108,15 @@ public final class Reflect {
 	 * @param type		The type of values this field takes
 	 * @param name		The name of this field
 	 */
-	public static <T, V> Var<T, V> lookupStaticField(Class<T> declarer, Class<V> type, String name) {
-		return new Var<T, V>(declarer, type, true, name);
+	public static <T, V> StaticVar<T, V> lookupStaticField(Class<T> declarer, Class<V> type, String name, String... aliases) {
+		return new StaticVar<T, V>(declarer, type, name);
 	}
 	
 	/**
 	 * Finds a hook into a static field by its string descriptor.
 	 */
-	public static <T, V> Var<T, V> lookupStaticField(String descriptor) {
-		return new Var<T, V>(true, descriptor);
+	public static <T, V> StaticVar<T, V> lookupStaticField(String descriptor) {
+		return new StaticVar<T, V>(descriptor);
 	}
 	
 	/**

@@ -8,10 +8,10 @@ import net.minecraft.network.PacketBuffer;
 
 import com.blazeloader.api.network.PacketChannel;
 import com.blazeloader.api.network.Side;
+import com.blazeloader.api.privileged.IPluginChannels;
 import com.blazeloader.bl.network.BLPacketParticles;
 import com.blazeloader.bl.network.BLPacketSpawnObject;
 import com.blazeloader.event.listeners.PacketChannelListener;
-import com.blazeloader.event.mixin.common.MPluginChannels;
 import com.blazeloader.util.version.Versions;
 import com.google.common.collect.ImmutableList;
 import com.mumfrey.liteloader.core.LiteLoader;
@@ -68,9 +68,9 @@ public class BLPacketChannels extends PacketChannel implements PacketChannelList
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void register() {
 		BLMain.LOGGER_FULL.info("Registering Blazeloader packet channel...");
-		((MPluginChannels)LiteLoader.getServerPluginChannels()).addPluginChannelListener(this);
+		((IPluginChannels)LiteLoader.getServerPluginChannels()).callAddPluginChannelListener(this);
 		if (Versions.isClient()) {
-			((MPluginChannels)LiteLoader.getClientPluginChannels()).addPluginChannelListener(this);
+			((IPluginChannels)LiteLoader.getClientPluginChannels()).callAddPluginChannelListener(this);
 		}
 		BLMain.LOGGER_FULL.debug("Packet channel registration complete.");
 	}

@@ -45,16 +45,14 @@ public final class Professions {
 		return Math.max((Integer)villager.getDataManager().get(((IEntityVillager)villager).getProfessionDataParameter()),0);
 	}
 	
-	public Boolean checkMatingConditions(EntityVillager villager, boolean fixedMarkiplier, int markiplier) {
+	public Boolean checkMatingConditions(EntityVillager villager, MatingCondition condition) {
 		IProfession profession = get(getProfessionId(villager));
 		if (profession == null) return null;
 		InventoryBasic inventory = villager.getVillagerInventory();
 		int i = inventory.getSizeInventory();
-		if (!fixedMarkiplier) {
-			markiplier = profession.getStackMultiplier();
-		}
+		
 		while (i-- > 0) {
-			if (profession.checkMatingConditions(inventory.getStackInSlot(i), markiplier)) {
+			if (profession.checkMatingConditions(inventory.getStackInSlot(i), condition)) {
 				return true;
 			}
 		}

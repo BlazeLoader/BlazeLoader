@@ -10,7 +10,6 @@ import com.mumfrey.liteloader.util.render.Icon;
 import net.minecraft.util.ResourceLocation;
 
 import java.net.URI;
-import java.net.URL;
 
 /**
  * BlazeLoader BrandingProvider
@@ -72,11 +71,7 @@ public class BlazeLoaderBrandingProvider implements BrandingProvider {
     
     @Override
     public URI getHomepage() {
-        try {
-            return new URL("http://www.blazeloader.com").toURI();
-        } catch (Exception e) {
-            throw new RuntimeException("Exception creating BlazeLoader.com URI!", e);
-        }
+    	return URI.create("http://www.blazeloader.com");
     }
     
     @Override

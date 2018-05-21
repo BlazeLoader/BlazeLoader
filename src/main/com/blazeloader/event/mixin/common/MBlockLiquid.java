@@ -19,7 +19,7 @@ public abstract class MBlockLiquid extends Block {
 	protected MBlockLiquid() {super(null);}
 
 	@Inject(method = "getSlopeAngle(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/material/Material;Lnet/minecraft/block/state/IBlockState;)F", at = @At("HEAD"))
-	static void iternalGetFlowDirection(IBlockAccess w, BlockPos pos, Material material, IBlockState state, CallbackInfoReturnable<Float> info) {
+	private static void iternalGetFlowDirection(IBlockAccess w, BlockPos pos, Material material, IBlockState state, CallbackInfoReturnable<Float> info) {
 		InternalEventHandler.eventGetFlowDirection(w, pos, state, info);
 	}
 }

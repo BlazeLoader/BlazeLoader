@@ -10,15 +10,15 @@
     "MEffectRenderer",
     "MEntityPlayerSP",
     "MGuiContainerCreative",
-    "MMinectraft",
-    "MModelBrakery",
+    "MMinecraft",
+    "MModelBakery",
+    "MModelBox",
     "MNetHandlerPlayClient",
     "MRenderItem",
     "MRenderManager",
     "MRenderVillager",
     "MTileEntityItemStackRenderer",
     "MTileEntityRendererDispatcher",
-    "MTimer",
-    "MVertexBUffer"
+    "MTimer"
   ]
 }

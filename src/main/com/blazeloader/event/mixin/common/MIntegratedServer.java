@@ -16,7 +16,7 @@ public abstract class MIntegratedServer extends MinecraftServer {
 	
 	public MIntegratedServer() {super(null, null, null, null, null, null, null);}
 
-	@Inject(method = "createNewCommandManager()Lnet/minecraft/command/ServerCommandManager;", at = @At(value = "RETURN", shift = Shift.BEFORE), cancellable = true)
+	@Inject(method = "createCommandManager()Lnet/minecraft/command/ServerCommandManager;", at = @At(value = "RETURN", shift = Shift.BEFORE), cancellable = true)
 	private void onCreateNewCommandManager(CallbackInfoReturnable<CommandHandler> info) {
 		InternalEventHandler.eventCreateNewCommandManager((MinecraftServer)(Object)this, info);
 	}

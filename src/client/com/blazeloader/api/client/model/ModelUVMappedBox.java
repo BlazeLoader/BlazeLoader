@@ -1,6 +1,6 @@
 package com.blazeloader.api.client.model;
 
-import com.blazeloader.event.mixin.client.MVertexBuffer;
+import com.blazeloader.event.mixin.client.MModelBox;
 
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelRenderer;
@@ -51,8 +51,8 @@ public class ModelUVMappedBox extends ModelBox {
     }
     
     public ModelUVMappedBox setNorthFaceUV(int x, int y) {//^^ Front
-    	TexturedQuad[] quadList = ((MVertexBuffer)(Object)this).getQuadList();
-    	PositionTextureVertex[] vertexPositions = ((MVertexBuffer)(Object)this).getVertexPositions();
+    	TexturedQuad[] quadList = ((MModelBox)(Object)this).getQuadList();
+    	PositionTextureVertex[] vertexPositions = ((MModelBox)(Object)this).getVertexPositions();
     	
     	quadList[0] = new TexturedQuad(new PositionTextureVertex[] {vertexPositions[5], vertexPositions[1], vertexPositions[2], vertexPositions[6]},
     			x, y, x + boxDepth, y + boxHeight, textureWidth, textureHeight);
@@ -61,8 +61,8 @@ public class ModelUVMappedBox extends ModelBox {
     }
     
     public ModelUVMappedBox setSouthFaceUV(int x, int y) {//^^ back
-    	TexturedQuad[] quadList = ((MVertexBuffer)(Object)this).getQuadList();
-    	PositionTextureVertex[] vertexPositions = ((MVertexBuffer)(Object)this).getVertexPositions();
+    	TexturedQuad[] quadList = ((MModelBox)(Object)this).getQuadList();
+    	PositionTextureVertex[] vertexPositions = ((MModelBox)(Object)this).getVertexPositions();
     	
     	quadList[1] = new TexturedQuad(new PositionTextureVertex[] {vertexPositions[0], vertexPositions[4], vertexPositions[7], vertexPositions[3]},
     			x, y, x + boxDepth, y + boxHeight, textureWidth, textureHeight);
@@ -71,8 +71,8 @@ public class ModelUVMappedBox extends ModelBox {
     }
     
     public ModelUVMappedBox setTopFaceUV(int x, int y) { //^^
-    	TexturedQuad[] quadList = ((MVertexBuffer)(Object)this).getQuadList();
-    	PositionTextureVertex[] vertexPositions = ((MVertexBuffer)(Object)this).getVertexPositions();
+    	TexturedQuad[] quadList = ((MModelBox)(Object)this).getQuadList();
+    	PositionTextureVertex[] vertexPositions = ((MModelBox)(Object)this).getVertexPositions();
     	
     	quadList[2] = new TexturedQuad(new PositionTextureVertex[] {vertexPositions[5], vertexPositions[4], vertexPositions[0], vertexPositions[1]},
     			x, y, x + boxWidth, y + boxDepth, textureWidth, textureHeight);
@@ -81,8 +81,8 @@ public class ModelUVMappedBox extends ModelBox {
     }
     
     public ModelUVMappedBox setBottomFaceUV(int x, int y) {//^^
-    	TexturedQuad[] quadList = ((MVertexBuffer)(Object)this).getQuadList();
-    	PositionTextureVertex[] vertexPositions = ((MVertexBuffer)(Object)this).getVertexPositions();
+    	TexturedQuad[] quadList = ((MModelBox)(Object)this).getQuadList();
+    	PositionTextureVertex[] vertexPositions = ((MModelBox)(Object)this).getVertexPositions();
     	
     	quadList[3] = new TexturedQuad(new PositionTextureVertex[] {vertexPositions[2], vertexPositions[3], vertexPositions[7], vertexPositions[6]},
     			x, y + boxDepth, x + boxWidth, y, textureWidth, textureHeight);
@@ -91,8 +91,8 @@ public class ModelUVMappedBox extends ModelBox {
     }
     
     public ModelUVMappedBox setEastFaceUV(int x, int y) {//^^ left
-    	TexturedQuad[] quadList = ((MVertexBuffer)(Object)this).getQuadList();
-    	PositionTextureVertex[] vertexPositions = ((MVertexBuffer)(Object)this).getVertexPositions();
+    	TexturedQuad[] quadList = ((MModelBox)(Object)this).getQuadList();
+    	PositionTextureVertex[] vertexPositions = ((MModelBox)(Object)this).getVertexPositions();
     	
     	quadList[4] = new TexturedQuad(new PositionTextureVertex[] {vertexPositions[1], vertexPositions[0], vertexPositions[3], vertexPositions[2]},
     			x, y, x + boxWidth, y + boxHeight, textureWidth, textureHeight);
@@ -101,8 +101,8 @@ public class ModelUVMappedBox extends ModelBox {
     }
     
     public ModelUVMappedBox setWestFaceUV(int x, int y) {//^^ Right
-    	TexturedQuad[] quadList = ((MVertexBuffer)(Object)this).getQuadList();
-    	PositionTextureVertex[] vertexPositions = ((MVertexBuffer)(Object)this).getVertexPositions();
+    	TexturedQuad[] quadList = ((MModelBox)(Object)this).getQuadList();
+    	PositionTextureVertex[] vertexPositions = ((MModelBox)(Object)this).getVertexPositions();
     	
     	quadList[5] = new TexturedQuad(new PositionTextureVertex[] {vertexPositions[4], vertexPositions[5], vertexPositions[6], vertexPositions[7]},
     			x, y, x + boxWidth, y + boxHeight, textureWidth, textureHeight);

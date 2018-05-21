@@ -21,8 +21,8 @@ public class BoundVar<T, V> extends Variable<T, V> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected BoundVar(T newInstance, Class<V> type, String name) {
-		super((Class<T>)newInstance.getClass(), type, false, name);
+	protected BoundVar(T newInstance, Class<V> type, String name, String... aliases) {
+		super((Class<T>)newInstance.getClass(), type, false, name, aliases);
 		instance = newInstance;
 	}
 	
@@ -34,7 +34,7 @@ public class BoundVar<T, V> extends Variable<T, V> {
 	 */
 	public V get(V def) {
 		valueSet = true;
-		return cached = _get(instance, def);
+		return cached = retrieve(instance, def);
 	}
 	
 	/**
@@ -45,7 +45,7 @@ public class BoundVar<T, V> extends Variable<T, V> {
 	public void set(V val) {
 		valueSet = true;
 		cached = val;
-		_set(instance, val);
+		deposit(instance, val);
 	}
 	
 	public void invalidate() {

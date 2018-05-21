@@ -10,7 +10,6 @@ import com.blazeloader.util.reflect.Reflect;
 import net.minecraft.world.WorldType;
 
 public class ApiWorldType {
-		
 	/**
 	 * Creates a new world type with the given name.
 	 * 

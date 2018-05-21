@@ -1,6 +1,8 @@
 package com.blazeloader.api.block;
 
 import com.blazeloader.api.item.ApiItem;
+import com.blazeloader.util.registry.Registry;
+import com.blazeloader.util.registry.RegistryIdManager;
 import com.blazeloader.util.version.Versions;
 import com.google.common.collect.ImmutableList;
 import com.mumfrey.liteloader.client.ducks.IMutableRegistry;
@@ -24,7 +26,7 @@ import java.util.Map;
  * Api for block-specific functions
  */
 public class ApiBlock {
-	private static int currFreeBlockId = 1;
+	private static final RegistryIdManager REGISTRY = new RegistryIdManager(() -> Registry.of(Block.REGISTRY));
 	
     /**
      * 
@@ -56,7 +58,7 @@ public class ApiBlock {
      */
     @SuppressWarnings("unchecked")
 	public static <T extends Block> T quickRegisterBlock(int id, String mod, String name, T block) {
-        return registerBlock(id, new ResourceLocation(mod, name), (T) block.setUnlocalizedName(mod + "." + name), (ItemBlock)(new ItemBlock(block)).setUnlocalizedName(mod + "." + name));
+    	return registerBlock(id, new ResourceLocation(mod, name), (T) block.setUnlocalizedName(mod + "." + name), (ItemBlock)(new ItemBlock(block)).setUnlocalizedName(mod + "." + name));
     }
 
     /**
@@ -265,18 +267,7 @@ public class ApiBlock {
      * @return true if it is free, false otherwise
      */
     public static boolean isIdFree(int id) {
-    	return !isIdRegistered(id) && ApiItem.isIdFree(id);
-    }
-    
-    /**
-     * Checks if the block registry contains a mapping for the given id.
-     * 
-     * @param id	Id to check
-     * @return
-     */
-    public static boolean isIdRegistered(int id) {
-    	if (id == 0) return true;
-    	return !getBlockById(id).equals(getBlockByName("air"));
+    	return !REGISTRY.hasId(id) && ApiItem.isIdFree(id);
     }
     
     /**
@@ -288,11 +279,7 @@ public class ApiBlock {
      * @return return a free block ID.
      */
     public static int getFreeBlockId() {
-    	Block air = getBlockByName("air");
-        while (!getBlockById(currFreeBlockId).equals(air) || !ApiItem.isIdFree(currFreeBlockId)) {
-            currFreeBlockId++;
-        }
-        return currFreeBlockId++;
+    	return REGISTRY.getNextFreeId();
     }
     
     /**

@@ -14,7 +14,7 @@ public abstract class MTimer implements ITimer {
 	@Accessor("elapsedTicks")
 	public abstract int getElapsedTicks();
 	
-	@Accessor("renderPartialTick")
+	@Accessor("renderPartialTicks")
 	public abstract float getPartialTicks();
 	
 	@Accessor("lastSyncSysClock")

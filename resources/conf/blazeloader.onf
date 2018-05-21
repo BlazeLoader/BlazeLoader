@@ -3,6 +3,7 @@
 	ahp:CreativeTabs
 #Allow new creative tab types
 		-f!a:78032_a:CREATIVE_TAB_ARRAY
+		-f!m:field_192395_m:HOTBAR
 :net.minecraft.world
 	amz:WorldType
 #Make WorldType.worldTypes non-final

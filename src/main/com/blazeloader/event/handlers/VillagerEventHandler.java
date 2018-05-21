@@ -3,6 +3,7 @@ package com.blazeloader.event.handlers;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.blazeloader.api.entity.profession.MatingCondition;
 import com.blazeloader.api.entity.profession.Professions;
 import com.blazeloader.event.mixin.Mix;
 
@@ -40,8 +41,8 @@ public class VillagerEventHandler {
 		Mix.intercept(Professions.instance().onGrownUp(sender), info);
 	}
 	
-    public static void eventCheckMatingConditions(EntityVillager sender, CallbackInfoReturnable<Boolean> info, boolean fixed, int markiplier) {
-    	Mix.intercept(Professions.instance().checkMatingConditions(sender, fixed, markiplier), info);
+    public static void eventCheckMatingConditions(EntityVillager sender, CallbackInfoReturnable<Boolean> info, MatingCondition condition) {
+    	Mix.intercept(Professions.instance().checkMatingConditions(sender, condition), info);
     }
     
     public static void eventSetAdditionalAITasks(EntityVillager sender, CallbackInfo info) {

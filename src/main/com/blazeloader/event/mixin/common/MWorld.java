@@ -1,10 +1,10 @@
 package com.blazeloader.event.mixin.common;
 
+import org.spongepowered.asm.mixin.Interface;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.blazeloader.api.privileged.IWorld;
@@ -19,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 @Mixin(World.class)
+@Interface(iface = IWorld.class, prefix = "wd")
 public abstract class MWorld implements ForgeWorldAccess, IWorld {
 	
 	public double MAX_ENTITY_RADIUS;
@@ -36,9 +37,12 @@ public abstract class MWorld implements ForgeWorldAccess, IWorld {
 	}
 	
 	@Invoker("isValid")
-	public abstract boolean isCoordValid(BlockPos pos);
+	public abstract boolean wd$isCoordValid(BlockPos pos);
 	
-	public WorldClock getWorldClock() {
+	@Invoker("isOutsideBuildHeight")
+	public abstract boolean wd$isOutsideBuildHeight(BlockPos pos);
+	
+	public WorldClock wd$getWorldClock() {
 		if (clock == null) clock = new WorldClock((World)(Object)this);
 		return clock;
 	}
@@ -51,11 +55,6 @@ public abstract class MWorld implements ForgeWorldAccess, IWorld {
 	@Inject(method = "spawnEntity(Lnet/minecraft/entity/Entity;)Z", at = @At("HEAD"), cancellable = true)
 	private void onSpawnEntityInWorld(Entity entity, CallbackInfoReturnable<Boolean> info) {
 		EventHandler.eventSpawnEntityInWorld(info, (World)(Object)this, entity);
-	}
-	
-	@Inject(method = "onEntityRemoved(Lnet/minecraft/entity/Entity;)V", at = @At("HEAD"))
-	private void internalOnEntityRemoved(Entity entity, CallbackInfo info) {
-		InternalEventHandler.eventOnEntityRemoved(entity);
 	}
 	
 	@Inject(method = "canBlockFreeze(Lnet/minecraft/util/math/BlockPos;Z)Z", at = @At("HEAD"), cancellable = true)

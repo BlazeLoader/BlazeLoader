@@ -3,7 +3,9 @@ package com.blazeloader.api.item;
 import java.lang.reflect.Field;
 
 import com.blazeloader.api.block.ApiBlock;
-import com.blazeloader.event.mixin.common.MItemBlock;
+import com.blazeloader.event.mixin.common.MItem;
+import com.blazeloader.util.registry.Registry;
+import com.blazeloader.util.registry.RegistryIdManager;
 import com.google.common.collect.Lists;
 import com.mumfrey.liteloader.client.ducks.IMutableRegistry;
 import net.minecraft.block.Block;
@@ -17,7 +19,7 @@ import net.minecraft.util.registry.RegistryNamespaced;
  * Api functions for items.
  */
 public class ApiItem {
-	private static int currFreeItemId = 1;
+	private static final RegistryIdManager REGISTRY = new RegistryIdManager(() -> Registry.of(Item.REGISTRY));
 	
     /**
      * Utility method to register an item.
@@ -114,7 +116,7 @@ public class ApiItem {
      */
     public static <T extends ItemBlock> T registerItemBlock(int id, ResourceLocation name, Block block, T item) {
         registerItem(id, name, item);
-        ((MItemBlock)(Object)item).getBlockItemMap().put(block, item);
+        ((MItem)(Object)item).getBlockItemMap().put(block, item);
         return item;
     }
     
@@ -136,7 +138,7 @@ public class ApiItem {
      * @return true if it is free, false otherwise
      */
     public static boolean isIdFree(int id) {
-    	return getItemById(id) == null;
+    	return !REGISTRY.hasId(id);
     }
     
     /**
@@ -145,10 +147,7 @@ public class ApiItem {
      * @return return a free item ID.
      */
     public static int getFreeItemId() {
-        while (!isIdFree(currFreeItemId)) {
-            currFreeItemId++;
-        }
-        return currFreeItemId++;
+        return REGISTRY.getNextFreeId();
     }
     
     /**
@@ -163,7 +162,7 @@ public class ApiItem {
     }
     
     /**
-     * Gets an item from by given id
+     * Gets an item from the given id
      * 
      * @param id The id
      * 

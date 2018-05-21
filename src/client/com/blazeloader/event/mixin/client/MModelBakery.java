@@ -23,7 +23,7 @@ public abstract class MModelBakery {
 	@Shadow
 	private Map<Item, List<String>> variantNames;
 	
-	@Accessor("LOCATIONS_BUILDIN_TEXTURES")
+	@Accessor("LOCATIONS_BUILTIN_TEXTURES")
 	public static Set<ResourceLocation> getBuiltinTextures() {
 		throw new NotImplementedException("MModelBakery mixin failed.");
 	}

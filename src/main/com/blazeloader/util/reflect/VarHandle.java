@@ -17,10 +17,11 @@ public class VarHandle {
 	
 	protected final String declaringContext;
 	
-	public VarHandle(Class<?> declarer, Class<?> type, boolean isStatic, String name) {
+	public VarHandle(Class<?> declarer, Class<?> type, boolean isStatic, String name, String... aliases) {
 		staticField = isStatic;
 		declaringContext = declarer.getCanonicalName();
 		lookupVariable(declarer, type, name);
+		for (int i = 0; !valid() && i < aliases.length; i++) lookupVariable(declarer, type, aliases[i]);
 	}
 	
 	public VarHandle(boolean isStatic, BLOBF obf) {

@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.blazeloader.api.entity.profession.MatingCondition;
 import com.blazeloader.api.privileged.IEntityVillager;
 import com.blazeloader.event.handlers.VillagerEventHandler;
 
@@ -58,19 +59,19 @@ public abstract class MEntityVillager extends EntityAgeable implements IMerchant
 		VillagerEventHandler.eventOnGrowingAdult((EntityVillager)(Object)this, info);
 	}
 	
-	@Inject(method = "func_175553_cp()Z", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "hasEnoughFoodToBreed()Z", at = @At("HEAD"), cancellable = true)
 	private void onHasEnoughItemsForOne(CallbackInfoReturnable<Boolean> info) {
-		VillagerEventHandler.eventCheckMatingConditions((EntityVillager)(Object)this, info, true, 1);
+		VillagerEventHandler.eventCheckMatingConditions((EntityVillager)(Object)this, info, MatingCondition.BREED);
 	}
 	
 	@Inject(method = "canAbondonItems()Z", at = @At("HEAD"), cancellable = true)
 	private void onHasEnoughItemsForTwo(CallbackInfoReturnable<Boolean> info) {
-		VillagerEventHandler.eventCheckMatingConditions((EntityVillager)(Object)this, info, true, 2);
+		VillagerEventHandler.eventCheckMatingConditions((EntityVillager)(Object)this, info, MatingCondition.GIVE);
 	}
 	
-	@Inject(method = "func_175557_cr()Z", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "wantsMoreFood()Z", at = @At("HEAD"), cancellable = true)
 	private void onCheckMatingConditions(CallbackInfoReturnable<Boolean> info) {
-		VillagerEventHandler.eventCheckMatingConditions((EntityVillager)(Object)this, info, false, 1);
+		VillagerEventHandler.eventCheckMatingConditions((EntityVillager)(Object)this, info, MatingCondition.FEED);
 	}
 	
 	@Inject(method = "getDisplayName()Lnet/minecraft/util/text/ITextComponent;", at = @At("HEAD"), cancellable = true)

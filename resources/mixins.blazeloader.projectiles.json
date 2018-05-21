@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion":  "0.4.10",
+  "package": "com.blazeloader.event.mixin.common.projectiles",
+  "refmap":  "mixins.blazeloader.refmap.json",
+  "mixins": [
+    "MEntityArrow",
+    "MEntityFireball",
+    "MEntityLlamaSpit",
+    "MEntityShulkerBullet",
+    "MEntityThrowable"
+  ]
+}

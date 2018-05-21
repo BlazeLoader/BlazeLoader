@@ -3,6 +3,9 @@ package com.blazeloader.api.block;
 import java.util.Collection;
 import java.util.Map.Entry;
 
+import com.blazeloader.api.world.storage.IMicroBlock;
+import com.blazeloader.api.world.storage.IMicroBlockState;
+import com.blazeloader.api.world.storage.MicroBlockState;
 import com.google.common.collect.Lists;
 
 import net.minecraft.block.Block;
@@ -29,16 +32,16 @@ import net.minecraft.world.World;
  * 
  * Not to be used directly.
  */
-public interface IBlock extends IRotateable, ISided {
+public interface IBlock extends IRotateable, ISided, IMicroBlock {
 	@Deprecated
-	public default boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
+	default boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
 		IBlockState state = world.getBlockState(pos);
 		EnumFacing rotation = getBlockRotation(world, pos, state);
 		return rotation != null && rotateBlockTo(world, pos, state, rotation.rotateAround(axis.getAxis()));
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public default boolean rotateBlockTo(World w, BlockPos pos, IBlockState state, EnumFacing facing) {
+	default boolean rotateBlockTo(World w, BlockPos pos, IBlockState state, EnumFacing facing) {
 		if (this instanceof BlockLever) {
 			w.setBlockState(pos, state.withProperty(BlockLever.FACING, EnumOrientation.forFacings(facing, EnumFacing.NORTH)));
 			return true;
@@ -69,7 +72,7 @@ public interface IBlock extends IRotateable, ISided {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public default EnumFacing[] getValidRotations(World world, BlockPos pos) {
+	default EnumFacing[] getValidRotations(World world, BlockPos pos) {
 		if (this instanceof BlockLever || this instanceof BlockRotatedPillar) {
 			return EnumFacing.values();
 		}
@@ -85,7 +88,7 @@ public interface IBlock extends IRotateable, ISided {
 		return null;
 	}
 	
-	public default EnumFacing getBlockRotation(World w, BlockPos pos, IBlockState state) {
+	default EnumFacing getBlockRotation(World w, BlockPos pos, IBlockState state) {
     	for (Entry<IProperty<?>, Comparable<?>> i : state.getProperties().entrySet()) {
 			if (i.getKey() instanceof PropertyEnum || i.getKey().getValueClass() == EnumFacing.class) {
 				return (EnumFacing)i.getValue();
@@ -94,11 +97,11 @@ public interface IBlock extends IRotateable, ISided {
     	return null;
 	}
 	
-	public default boolean isSideSolid(IBlockAccess w, BlockPos pos, EnumFacing side) {
+	default boolean isSideSolid(IBlockAccess w, BlockPos pos, EnumFacing side) {
 		return isSideSolid(w, pos, side, false);
 	}
 	
-	public default boolean isSideSolid(IBlockAccess w, BlockPos pos, EnumFacing side, boolean def) {
+	default boolean isSideSolid(IBlockAccess w, BlockPos pos, EnumFacing side, boolean def) {
 		IBlockState state = w.getBlockState(pos);
         Block block = (Block)this;
         
@@ -115,5 +118,9 @@ public interface IBlock extends IRotateable, ISided {
 			if (block instanceof BlockHopper) return true;
 		}
     	return def;
+	}
+	
+	default IMicroBlockState getDefaultMicroState() {
+		return MicroBlockState.EMPTY;
 	}
 }

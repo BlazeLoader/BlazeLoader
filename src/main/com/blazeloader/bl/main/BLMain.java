@@ -11,7 +11,7 @@ import net.minecraft.command.ServerCommandManager;
 import net.minecraft.server.MinecraftServer;
 
 import com.blazeloader.api.ApiServer;
-import com.blazeloader.bl.interop.ForgeModloader;
+import com.blazeloader.bl.interop.IFML;
 import com.blazeloader.util.version.BuildType;
 import com.blazeloader.util.version.Version;
 import com.blazeloader.util.version.type.BasicVersion;
@@ -105,11 +105,19 @@ public class BLMain {
             LOGGER_FULL.fatal(message);
             if (!initiateShutdown()) {
                 LOGGER_FULL.fatal("Game is not running, closing immediately with code %s!", code);
-                ForgeModloader.instance().exitJava(code, false);
+                if (IFML.isForge()) {
+                	IFML.instance().exitJava(code, false);
+                } else {
+                	System.exit(code);
+                }
             }
         } catch (Throwable t) {
             t.printStackTrace();
-            ForgeModloader.instance().exitJava(code, false);
+            if (IFML.isForge()) {
+            	IFML.instance().exitJava(code, false);
+            } else {
+            	System.exit(code);
+            }
         }
     }
     

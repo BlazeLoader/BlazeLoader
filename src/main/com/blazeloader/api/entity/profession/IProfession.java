@@ -18,12 +18,15 @@ public interface IProfession {
 	 * Called on each item in the villager's inventory.
 	 * 
 	 * @param stack				Stack to check
-	 * @param stackMultiplier	Multiplier for the stack size
+	 * @param condition			The current mating condition being tested
 	 * 
 	 * @return	True if it may mate, false otherwise
 	 */
-	boolean checkMatingConditions(ItemStack stack, int stackMultiplier);
+	boolean checkMatingConditions(ItemStack stack, MatingCondition condition);
 	
+	/**
+	 * The amount this villager loves to eat.
+	 */
 	int getStackMultiplier();
 	
 	int getNewCareer(Random rand);

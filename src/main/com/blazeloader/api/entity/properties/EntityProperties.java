@@ -1,8 +1,10 @@
 package com.blazeloader.api.entity.properties;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.blazeloader.bl.main.BLMain;
 import com.blazeloader.util.data.INBTWritable;
-import com.mumfrey.liteloader.core.event.HandlerList;
 
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
@@ -10,7 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
 public class EntityProperties implements INBTWritable {
-	private final HandlerList<IEntityProperties> handlers = new HandlerList<IEntityProperties>(IEntityProperties.class);
+	private final List<IEntityProperties> handlers = new ArrayList<IEntityProperties>();
 	
 	public EntityProperties() {}
 	
@@ -47,11 +49,11 @@ public class EntityProperties implements INBTWritable {
 	}
 	
 	public void onEntityUpdate(Entity entity) {
-		handlers.all().onEntityUpdate(entity);
+		for (IEntityProperties i : handlers) i.onEntityUpdate(entity);
 	}
 	
 	public void entityInit(Entity entity, World world) {
-		handlers.all().entityInit(entity, world);
+		for (IEntityProperties i : handlers) i.entityInit(entity, world);
 	}
 	
 	public EntityProperties readFromNBT(NBTTagCompound t) {
@@ -62,7 +64,7 @@ public class EntityProperties implements INBTWritable {
 			modsTag = new NBTTagCompound();
 		}
 		try {
-			handlers.all().readFromNBT(modsTag);
+			for (IEntityProperties i : handlers) i.readFromNBT(modsTag);
 		} catch (Throwable er) {
 			BLMain.LOGGER_FULL.fatal("Failed in reading entity NBT into (" + this.getClass().getCanonicalName() + ").", er);
 		}
@@ -74,7 +76,7 @@ public class EntityProperties implements INBTWritable {
 		NBTTagCompound modsTag = new NBTTagCompound();
 		t.setTag("BlazeLoader", modsTag);
 		try {
-			handlers.all().writeToNBT(modsTag);
+			for (IEntityProperties i : handlers) i.writeToNBT(modsTag);
 		} catch (Throwable er) {
 			BLMain.LOGGER_FULL.fatal("Failed in writing entity NBT from (" + this.getClass().getCanonicalName() + ").", er);
 		}

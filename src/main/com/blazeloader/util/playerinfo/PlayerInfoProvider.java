@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import com.blazeloader.util.config.JsonUtils;
 import com.blazeloader.util.http.Downloader;
-import com.blazeloader.util.http.JsonDownload;
+import com.blazeloader.util.http.IDownloadCallbackJson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
@@ -61,7 +61,7 @@ class PlayerInfoProvider {
     private void loadPlayerInfo() {
     	if (hasLoaded) return;
     	hasLoaded = true;
-    	(new Downloader("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", ""))).download(new JsonDownload() {
+    	(new Downloader("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", ""))).download(new IDownloadCallbackJson() {
 			public void success(JsonElement json) {
 				JsonObject obj = json.getAsJsonObject();
 				if (obj.has("properties")) {

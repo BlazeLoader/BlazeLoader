@@ -26,7 +26,7 @@ public abstract class MWorldType implements IWorldType {
 	@Accessor("WORLD_TYPES") @AccessTransform(action="Non-Final")
 	public static void setWorldTypes(WorldType[] types) {}
 	
-	@Inject(method = "updateEquipmentIfNeeded(Lnet/minecraft/entity/item/EntityItem;)V", at = @At("RETURN"))
+	@Inject(method = "getTranslationKey()Ljava/lang/String;", at = @At("RETURN"))
 	public void onGetTranslationKey(CallbackInfoReturnable<String> info) {
 		if (mod != null) info.setReturnValue(mod + ".generator." + name);
 	}

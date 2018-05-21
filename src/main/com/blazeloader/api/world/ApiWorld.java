@@ -10,6 +10,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.village.VillageCollection;
@@ -53,7 +54,7 @@ public class ApiWorld {
      * 
      * @return	The resulting {@code T} object associated with this world.
      */
-	public static <T extends WorldSavedData> T registerWorldData(WorldServer world, Class<T> dataClass, String identifier) {
+	public static <T extends WorldSavedData> T registerWorldData(World world, Class<T> dataClass, String identifier) {
 		@SuppressWarnings("unchecked")
 		T loaded = (T)world.loadData(dataClass, identifier);
 
@@ -115,6 +116,22 @@ public class ApiWorld {
 		}
 		return null;
 	}
+	
+	/**
+	 * Gets an entity from the given server by its runtime id
+	 * regardless of dimension.
+	 * 
+	 * @param server		The server
+	 * @param entityId		Id of the entity to find
+	 * @return	An Entity instance or null if none were found.
+	 */
+	public static Entity getEntityById(MinecraftServer server, int entityId) {
+    	for (WorldServer i : server.worlds) {
+    		Entity owner = i.getEntityByID(entityId);
+    		if (owner != null) return owner;
+    	}
+    	return null;
+    }
     
     /**
      * Gets entities of type in the world within a certain radius from a given point

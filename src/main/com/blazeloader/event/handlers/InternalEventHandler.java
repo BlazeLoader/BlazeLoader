@@ -1,5 +1,6 @@
 package com.blazeloader.event.handlers;
 
+import java.io.File;
 import java.util.List;
 import java.util.Random;
 
@@ -14,7 +15,6 @@ import net.minecraft.crash.CrashReport;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.EntityTrackerEntry;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.Packet;
@@ -23,12 +23,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.ReportedException;
+import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.chunk.storage.AnvilChunkLoader;
+import net.minecraft.world.chunk.storage.IChunkLoader;
+import net.minecraft.world.storage.SaveHandler;
 
 import com.blazeloader.api.ApiGeneral;
 import com.blazeloader.api.block.fluid.Fluid;
@@ -81,14 +86,17 @@ public class InternalEventHandler {
 		}
 	}
 	
-	public static void eventOnEntityRemoved(Entity entity) {
-		
+	public static void eventGetChunkLoader(SaveHandler sender, DataFixer fixer, WorldProvider provider, CallbackInfoReturnable<IChunkLoader> info) {
+		int dim = provider.getDimensionType().getId();
+		if (dim != 0) {
+			File worldDirectory = sender.getWorldDirectory();
+			
+            File loc = new File(worldDirectory, "DIM-" + dim);
+            loc.mkdirs();
+            info.setReturnValue(new AnvilChunkLoader(loc, fixer));
+		}
 	}
 	
-    public static void eventClonePlayer(EntityPlayer sender, EntityPlayer old, boolean respawnedFromEnd) {
-    	
-    }
-    
     public static void eventTrackEntity(EntityTracker sender, CallbackInfo info, Entity entity) {
     	if (EntityTrackerRegistry.instance().addEntityToTracker(sender, entity)) {
     		info.cancel();

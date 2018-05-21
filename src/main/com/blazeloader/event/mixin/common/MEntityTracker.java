@@ -12,7 +12,7 @@ import net.minecraft.entity.EntityTracker;
 
 @Mixin(EntityTracker.class)
 public abstract class MEntityTracker {
-	@Inject(method = "trackEntity(Lnet/minecraft/entity/Entity;)V", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "track(Lnet/minecraft/entity/Entity;)V", at = @At("HEAD"), cancellable = true)
 	private void onTrackEntity(Entity entity, CallbackInfo info) {
 		InternalEventHandler.eventTrackEntity((EntityTracker)(Object)this, info, entity);
 	}

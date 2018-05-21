@@ -6,8 +6,8 @@ public abstract class Variable<T, V> {
 	
 	protected final VarHandle handle;
 	
-	public Variable(Class<T> declarer, Class<V> type, boolean isStatic, String name) {
-		handle = new VarHandle(declarer, type, isStatic, name);
+	public Variable(Class<T> declarer, Class<V> type, boolean isStatic, String name, String... aliases) {
+		handle = new VarHandle(declarer, type, isStatic, name, aliases);
 	}
 	
 	public Variable(boolean isStatic, BLOBF obf) {
@@ -22,7 +22,7 @@ public abstract class Variable<T, V> {
 		handle = original.handle;
 	}
 	
-	protected V _get(T instance, V def) {
+	protected V retrieve(T instance, V def) {
 		if (handle.get != null) {
 			try {
 				return (V)handle.get.invoke(instance);
@@ -33,7 +33,7 @@ public abstract class Variable<T, V> {
 		return handleGetFail(instance, def);
 	}
 	
-	protected void _set(T instance, V val) {
+	protected void deposit(T instance, V val) {
 		if (handle.set != null) {
 			try {
 				handle.set.invoke(instance, val);

@@ -11,12 +11,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
 
 /**
- * Download callback for json responses. The data will be automatically unpackaged to a json element.
+ * Download callback for json responses. The data will be automatically unpacked to a json element.
  */
-public abstract class JsonDownload implements IDownloadCallback {
+@FunctionalInterface
+public interface IDownloadCallbackJson extends IDownloadCallback {
 
 	@Override
-	public void success(InputStream stream) {
+	default void success(InputStream stream) {
 		BufferedReader in = null;
         try {
             in = new BufferedReader(new InputStreamReader(stream));
@@ -36,7 +37,7 @@ public abstract class JsonDownload implements IDownloadCallback {
 	/**
 	 * Called when a response is received from the server.
 	 * 
-	 * @param json	Responce, preparsed into a json element.
+	 * @param json	Response, preparsed into a json element.
 	 */
-	public abstract void success(JsonElement json);
+	void success(JsonElement json);
 }

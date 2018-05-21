@@ -19,15 +19,16 @@ import com.blazeloader.api.entity.tracker.ITrack;
 import com.blazeloader.api.privileged.PEntityList;
 import com.blazeloader.event.mixin.common.MEntityList;
 import com.blazeloader.event.mixin.common.MTileEntity;
+import com.blazeloader.util.registry.Registry;
+import com.blazeloader.util.registry.RegistryIdManager;
 import com.google.common.collect.Lists;
 
 /**
  * Api for entity-related functions
  */
 public class ApiEntity {
-
-    private static int currFreeEntityId = 1;
-
+	private static final RegistryIdManager REGISTRY = new RegistryIdManager(() -> Registry.of(EntityList.REGISTRY));
+	
     /**
      * Registers a custom entity type.
      *
@@ -156,7 +157,7 @@ public class ApiEntity {
     }
     
     public static boolean isIdFree(int id) {
-    	return getEntityClassFromID(id) == null;
+    	return !REGISTRY.hasId(id);
     }
     
     /**
@@ -165,10 +166,7 @@ public class ApiEntity {
      * @return return a free entity ID.
      */
     public static int getFreeEntityId() {
-        while (!isIdFree(currFreeEntityId)) {
-            currFreeEntityId++;
-        }
-        return currFreeEntityId++;
+        return REGISTRY.getNextFreeId();
     }
 
     /**

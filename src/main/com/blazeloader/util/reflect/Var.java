@@ -10,28 +10,16 @@ import com.blazeloader.bl.obf.BLOBF;
  */
 public class Var<T, V> extends Variable<T, V> {
 	
-	public Var(Class<T> declarer, Class<V> type, String name) {
-		this(declarer, type, false, name);
-	}
-	
-	public Var(Class<T> declarer, Class<V> type, boolean isStatic, String name) {
-		super(declarer, type, isStatic, name);
+	public Var(Class<T> declarer, Class<V> type, String name, String... aliases) {
+		super(declarer, type, false, name, aliases);
 	}
 	
 	public Var(BLOBF obf) {
-		this(false, obf);
-	}
-	
-	public Var(boolean isStatic, BLOBF obf) {
-		super(isStatic, obf);
+		super(false, obf);
 	}
 	
 	public Var(String descriptor) {
-		this(false, descriptor);
-	}
-	
-	public Var(boolean isStatic, String descriptor) {
-		super(isStatic, descriptor);
+		super(false, descriptor);
 	}
 	
 	protected Var(Variable<T,V> original) {
@@ -46,7 +34,7 @@ public class Var<T, V> extends Variable<T, V> {
 	 * @return	T object referenced by this field
 	 */
 	public V get(T instance, V def) {
-		return _get(instance, def);
+		return retrieve(instance, def);
 	}
 	
 	/**
@@ -56,7 +44,7 @@ public class Var<T, V> extends Variable<T, V> {
 	 * @param val		The value to assign to the underlying field
 	 */
 	public void set(T instance, V val) {
-		_set(instance, val);
+		deposit(instance, val);
 	}
 	
 	/**

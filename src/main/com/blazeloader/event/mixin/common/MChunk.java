@@ -14,18 +14,18 @@ import net.minecraft.world.gen.IChunkGenerator;
 
 @Mixin(Chunk.class)
 public abstract class MChunk {
-	@Inject(method = "onChunkLoad()V", at = @At("RETURN"))
-	private void onOnChunkLoad(CallbackInfo info) {
+	@Inject(method = "onLoad()V", at = @At("RETURN"))
+	private void onOnLoad(CallbackInfo info) {
 		EventHandler.eventOnChunkLoad((Chunk)(Object)this);
 	}
 	
-	@Inject(method = "onChunkUnload()V", at = @At("RETURN"))
-	private void onOnChunkUnload(CallbackInfo info) {
+	@Inject(method = "onUnload()V", at = @At("RETURN"))
+	private void onOnUnload(CallbackInfo info) {
 		EventHandler.eventOnChunkUnload((Chunk)(Object)this);
 	}
 	
-	@Inject(method = "populateChunk(Lnet/minecraft/world/chunk/IChunkProvider;Lnet/minecraft/world/gen/IChunkGenerator;)V", at = @At("RETURN"))
-	private void onPopulateChunk(IChunkProvider one, IChunkGenerator two, CallbackInfo info) {
+	@Inject(method = "populate(Lnet/minecraft/world/chunk/IChunkProvider;Lnet/minecraft/world/gen/IChunkGenerator;)V", at = @At("RETURN"))
+	private void onPopulate(IChunkProvider one, IChunkGenerator two, CallbackInfo info) {
 		InternalEventHandler.eventPopulateChunk((Chunk)(Object)this, one, two);
 	}
 }

@@ -16,4 +16,10 @@ public interface MCreativeTabs {
 	public static void setCreativeTabsArray(CreativeTabs[] tabs) {
         throw new NotImplementedException("MCreativeTabs mixin failed.");
 	}
+	
+	@Accessor("HOTBAR")
+	@AccessTransform(action="Non-Final")
+	public static void setHotbarTab(CreativeTabs tab) {
+		throw new NotImplementedException("MCreativeTabs mixin failed.");
+	}
 }

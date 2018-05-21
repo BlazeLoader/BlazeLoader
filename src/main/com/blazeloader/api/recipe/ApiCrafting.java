@@ -1,6 +1,6 @@
 package com.blazeloader.api.recipe;
 
-import com.blazeloader.util.registry.ObjectRegistry;
+import com.blazeloader.util.registry.Registry;
 import com.blazeloader.util.resources.ResourceDirectoryWalker;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
@@ -54,7 +54,7 @@ public class ApiCrafting {
 	 * Creates a brand spanking **new** Crafting Manager.
 	 */
 	public static ICraftingManager createCraftingManager() {
-		return createCraftingManager(ObjectRegistry.createNamespacedRegistry());
+		return createCraftingManager(Registry.createNamespacedRegistry());
 	}
 	
 	private static ICraftingManager createCraftingManager(RegistryNamespaced<ResourceLocation, IRecipe> startingRecipes) {
@@ -107,7 +107,7 @@ public class ApiCrafting {
 	    }
 	    
 	    public boolean removeRecipe(IRecipe recipe) {
-	    	return ObjectRegistry.of(recipes).removeObjectFromRegistry(recipes.getNameForObject(recipe)) != null;
+	    	return Registry.of(recipes).removeObjectFromRegistry(recipes.getNameForObject(recipe)) != null;
 	    }
 	    
 	    public int removeRecipe(ItemStack result) {
@@ -119,7 +119,7 @@ public class ApiCrafting {
 	    	for (IRecipe i : recipes) {
 	    		if (i.getRecipeOutput() == result) {
 	    			count++;
-	    			ObjectRegistry.of(recipes).removeObjectFromRegistry(recipes.getNameForObject(i));
+	    			Registry.of(recipes).removeObjectFromRegistry(recipes.getNameForObject(i));
 	    			if (maxRemovals > 0 && count >= maxRemovals) return count;
 	    		}
 	    	}

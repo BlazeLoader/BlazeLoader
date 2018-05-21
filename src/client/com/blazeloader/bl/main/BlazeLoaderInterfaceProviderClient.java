@@ -28,11 +28,6 @@ public class BlazeLoaderInterfaceProviderClient extends BlazeLoaderInterfaceProv
         delegate.registerInterface(ResourcesListener.class);
     }
     
-    @Override
-    public void initProvider() {
-
-    }
-    
     public void addClientEvent(GuiListener e) {
         EventHandlerClient.guiEventClients.add(e);
     }

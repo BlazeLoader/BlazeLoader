@@ -18,7 +18,7 @@ public abstract class MInventoryPlayer implements IInventory {
 		EventHandler.eventChangeCurrentItem((InventoryPlayer)(Object)this, info, increment);
 	}
 	
-	@Inject(method = "func_184434_a(Lnet/minecraft/item/ItemStack;)V", at = @At("RETURN"))
+	@Inject(method = "setPickedItemStack(Lnet/minecraft/item/ItemStack;)V", at = @At("RETURN"))
 	private void onSetCurrentItem(ItemStack stack, CallbackInfo info) {
 		EventHandler.eventSetCurrentItem((InventoryPlayer)(Object)this, stack);
 	}

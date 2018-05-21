@@ -10,6 +10,8 @@ import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketThreadUtil;
 import net.minecraft.network.play.INetHandlerPlayClient;
@@ -60,12 +62,19 @@ public class EventHandlerClient extends EventHandler {
     }
     
     public static GuiScreen getCreativeGui(Minecraft sender, GuiScreen original) {
+    	
+    	if (ApiGui.getCreativeTabsRegistry().length <= 12) {
+	    	for (int i = 0; i < 20; i++) {
+				ApiGui.registerCreativeTab("test", "Test " + i, new ItemStack(Items.STONE_AXE));
+			}
+    	}
+    	
     	if (ApiGui.getCreativeTabsRegistry().length > 12 && original instanceof GuiContainerCreative && !(original instanceof CreativeTabGui)) {
     		return new CreativeTabGui(sender.player);
     	}
     	return original;
     }
-
+    
     public static void eventLoadWorld(Minecraft sender, WorldClient world, String message) {
         if (world != null) {
             worldEventClients.all().onWorldLoad(sender, world, message);

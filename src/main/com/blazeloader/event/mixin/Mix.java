@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 public class Mix {
 	/**
-	 * Cancels an event if the passed result is true (indicates method overriden).
+	 * Cancels an event if the passed result is true (indicates method overriding).
 	 */
 	public static void intercept(boolean val, CallbackInfo info) {
 		if (val) info.cancel();

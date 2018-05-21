@@ -9,7 +9,7 @@ import net.minecraft.profiler.Profiler;
  */
 public interface ProfilerListener extends BLMod {
     /**
-     * Called when a profiler section is started.  Mods are notified BEFORE profiler.
+     * Called when a profiler section is started.  Mods are notified BEFORE the profiler.
      *
      * @param profiler    The profiler who's section is starting.
      * @param sectionName Name of the profiler section started.
@@ -17,7 +17,7 @@ public interface ProfilerListener extends BLMod {
     public void onSectionStart(Profiler profiler, String sectionName);
 
     /**
-     * Called when a profiler section is ended.  Mods are notified BEfORE profiler.
+     * Called when a profiler section is ended.  Mods are notified BEfORE the profiler.
      *
      * @param profiler    The profiler who's section is starting.
      * @param sectionName Name of the profiler section ended.

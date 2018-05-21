@@ -20,9 +20,7 @@ public class BlazeLoaderInterfaceProvider implements InterfaceProvider {
 	
 	private static final BlazeLoaderInterfaceProvider instance = new BlazeLoaderInterfaceProvider();
 	
-	private BlazeLoaderInterfaceProvider() {
-		
-	}
+	protected BlazeLoaderInterfaceProvider() { }
 	
 	protected static final BlazeLoaderInterfaceProvider instance() {
 		return instance;

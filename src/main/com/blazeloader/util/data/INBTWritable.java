@@ -2,16 +2,16 @@ package com.blazeloader.util.data;
 
 import net.minecraft.nbt.NBTTagCompound;
 
-public interface INBTWritable {
+public interface INBTWritable extends INBTSerialisable<NBTTagCompound> {
+	
+	default NBTTagCompound writeToNBT() {
+		NBTTagCompound tag = new NBTTagCompound();
+		writeToNBT(tag);
+		return tag;
+	}
 	
 	/**
-	 * @param tagCompound
+	 * @param tag	The tag to write to
 	 */
-	public void writeToNBT(NBTTagCompound tagCompound);
-	
-	/**
-	 * 
-	 * @param tagCompound
-	 */
-	public INBTWritable readFromNBT(NBTTagCompound tagCompound);
+	void writeToNBT(NBTTagCompound tag);
 }

@@ -16,7 +16,7 @@ import net.minecraft.util.IThreadListener;
 
 @Mixin(MinecraftServer.class)
 public abstract class MMinecraftServer implements ICommandSender, Runnable, IThreadListener, ISnooperInfo {
-	@Inject(method = "createNewCommandManager()Lnet/minecraft/command/ServerCommandManager;", at = @At("RETURN"), cancellable = true)
+	@Inject(method = "createCommandManager()Lnet/minecraft/command/ServerCommandManager;", at = @At("RETURN"), cancellable = true)
 	private void onCreateNewCommandManager(CallbackInfoReturnable<CommandHandler> info) {
 		InternalEventHandler.eventCreateNewCommandManager((MinecraftServer)(Object)this, info);
 	}
