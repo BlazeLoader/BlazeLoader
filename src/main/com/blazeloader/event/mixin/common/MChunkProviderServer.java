@@ -18,7 +18,7 @@ public class MChunkProviderServer {
 	@Shadow @Final
 	private WorldServer world;
 	
-	@Inject(method = "queueUnload(Lnet/minecraft/world/chunk/Chunk;)V", at = @At("HEAD"))
+	@Inject(method = "queueUnload(Lnet/minecraft/world/chunk/Chunk;)V", at = @At("HEAD"), cancellable = true)
 	public void onQueueUnload(Chunk chunk, CallbackInfo info) {
 		if (world.isSpawnChunk(chunk.x, chunk.z)) {
 			if (((ForgeDimensionType)(Object)world.provider.getDimensionType()).shouldLoadSpawn()) {
