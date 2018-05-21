@@ -37,12 +37,13 @@ public abstract class MWorld implements ForgeWorldAccess, IWorld {
 	}
 	
 	@Invoker("isValid")
-	public abstract boolean wd$isCoordValid(BlockPos pos);
+	public abstract boolean isCoordValid(BlockPos pos);
 	
 	@Invoker("isOutsideBuildHeight")
 	public abstract boolean wd$isOutsideBuildHeight(BlockPos pos);
 	
-	public WorldClock wd$getWorldClock() {
+	@Override
+	public WorldClock getWorldClock() {
 		if (clock == null) clock = new WorldClock((World)(Object)this);
 		return clock;
 	}
