@@ -62,13 +62,6 @@ public class EventHandlerClient extends EventHandler {
     }
     
     public static GuiScreen getCreativeGui(Minecraft sender, GuiScreen original) {
-    	
-    	if (ApiGui.getCreativeTabsRegistry().length <= 12) {
-	    	for (int i = 0; i < 20; i++) {
-				ApiGui.registerCreativeTab("test", "Test " + i, new ItemStack(Items.STONE_AXE));
-			}
-    	}
-    	
     	if (ApiGui.getCreativeTabsRegistry().length > 12 && original instanceof GuiContainerCreative && !(original instanceof CreativeTabGui)) {
     		return new CreativeTabGui(sender.player);
     	}
