@@ -165,6 +165,7 @@ public class ParticlesRegister<T> {
         	x = e.posX + e.width/2 + f;
         	vX += 0.5;
         }
+        
         spawnDigginFX(e.getEntityWorld(), x, y, z, vX, vY, vZ, blockState, 0.2F, 0.6F);
     }
     

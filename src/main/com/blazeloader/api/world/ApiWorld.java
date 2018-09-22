@@ -309,7 +309,7 @@ public class ApiWorld {
      */
     public static void playBlockDestructionEffect(World w, BlockPos pos) {
         if (!w.isRemote) {
-            playAuxSFX(w, AuxilaryEffects.BLOCK_BREAK, pos, Block.getStateId(w.getBlockState(pos)));
+            playAuxSFX(w, WorldEvent.DESTROY_BLOCK, pos, Block.getStateId(w.getBlockState(pos)));
         }
     }
     
@@ -321,7 +321,7 @@ public class ApiWorld {
      * @param direction	The direction the block is facing
      */
     public static void spawnDispenserParticles(World w, BlockPos pos, EnumFacing direction) {
-        playAuxSFX(w, AuxilaryEffects.DISPENSE_PARTICLES, pos, direction.getFrontOffsetX() + 1 + (direction.getFrontOffsetZ() + 1) * 3);
+        playAuxSFX(w, WorldEvent.DISPENSE_PARTICLES, pos, direction.getFrontOffsetX() + 1 + (direction.getFrontOffsetZ() + 1) * 3);
     }
     
 	/**
@@ -332,7 +332,7 @@ public class ApiWorld {
 	 * @param pos		The location
 	 * @param volume	Volume
 	 */
-	public static void playAuxSFX(World w, AuxilaryEffects soundType, BlockPos pos, int volume) {
+	public static void playAuxSFX(World w, WorldEvent soundType, BlockPos pos, int volume) {
 		w.playEvent(soundType.getId(), pos, volume);
 	}
 	
@@ -345,7 +345,7 @@ public class ApiWorld {
 	 * @param pos		The location
 	 * @param volume	Volume
 	 */
-	public static void playAuxSFX(World w, EntityPlayer player, AuxilaryEffects soundType, BlockPos pos, int volume) {
+	public static void playAuxSFX(World w, EntityPlayer player, WorldEvent soundType, BlockPos pos, int volume) {
 		w.playEvent(player, soundType.getId(), pos, volume);
 	}
     

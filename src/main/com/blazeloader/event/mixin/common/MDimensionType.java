@@ -1,12 +1,9 @@
 package com.blazeloader.event.mixin.common;
 
 import org.spongepowered.asm.mixin.Mixin;
-import com.blazeloader.api.world.ApiDimension;
 import com.blazeloader.bl.interop.ForgeDimensionType;
 
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DimensionType;
-import net.minecraft.world.WorldProvider;
 
 @Mixin(DimensionType.class)
 public abstract class MDimensionType implements ForgeDimensionType {
